@@ -345,6 +345,25 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:720px}
 .ri-tp textarea{font:inherit;font-size:13px;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 10px;resize:vertical;min-width:0}
 .ri-card .row{display:flex;gap:8px;flex-wrap:wrap}
 .ri-none{font-size:13px;color:var(--faint);margin:0 0 8px}
+.ms-region{font-size:13px;line-height:1.5;padding:10px 12px;border-radius:9px;background:var(--surface-2);margin-bottom:10px}.ms-region small{display:block;color:var(--faint)}
+.ms-office{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}.ms-line{font-size:13px;color:var(--muted);margin:0 0 8px}
+.ms-tbl{min-width:640px}.ms-wide{min-width:1500px}.ms-tbl .tag{margin:1px 2px 1px 0}.ms-tbl tr.ms-note td{border-bottom:1px solid var(--line-2);padding-top:0}
+.ms-ph{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:6px}.ms-ph h3{margin:0;font-size:16px}
+.ms-inline{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.ms-inline select,.ms-num,.ms-form input,.ms-entry input,.ms-entry select{height:34px;border-radius:9px;border:1px solid var(--line);background:var(--surface-2);padding:0 10px;color:var(--fg);min-width:0}
+.ms-num{width:110px}
+.ms-sec{border-top:1px solid var(--line);margin-top:14px;padding-top:12px}.ms-sec h4{margin:0 0 8px;font-size:14px}
+.ms-det{margin:8px 0;font-size:13px}.ms-det summary{cursor:pointer;color:var(--accent)}
+.ms-cands{list-style:none;margin:6px 0;padding:0;display:grid;gap:6px;font-size:13px}.ms-cands small{color:var(--faint)}.ms-cands .btn{height:28px;padding:0 10px;font-size:12px}
+.ms-form{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px;font-size:13px}.ms-form input{flex:1 1 160px}
+.ms-entry{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px}.ms-entry label{display:grid;gap:3px;font-size:12px;color:var(--muted)}.ms-entry .wide{grid-column:span 2}
+@media (max-width:560px){.ms-entry .wide{grid-column:1/-1}}
+.ms-actions{display:flex;gap:8px;align-items:end}
+.ms-upload{margin-top:14px;display:grid;gap:8px;font-size:13px}.ms-upload .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.ms-preview{padding:10px;border-radius:9px;background:var(--surface-2)}
+.ms-list{margin:4px 0 8px;padding-left:18px;font-size:13px}.ms-list small{color:var(--faint)}
+.ms-two{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-top:12px;font-size:13px}
+.ms-find{list-style:none;margin:0;padding:0;display:grid;gap:6px}.ms-find label{display:grid;grid-template-columns:auto 1fr;gap:8px;font-size:13px;cursor:pointer}.ms-find small{display:block;color:var(--faint)}
 .ri-points{border-top:1px solid var(--line);margin-top:14px;padding-top:14px}
 .ri-points h4{margin:10px 0 4px;font-size:13px}.ri-points ul{margin:0;padding-left:18px;font-size:13px}.ri-points li{margin-bottom:6px}.ri-points small{display:block;color:var(--faint)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -631,7 +650,7 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:720px}
         <div class="ph"><h2>Regional manager insights</h2><span class="label" id="riMeta"></span></div>
         <p class="sub">Local rules compare each community's month with the prior month on file and with your targets. Every finding shows its source report, period and calculation. Nothing is sent anywhere. Approve the ones you want: approved talking points are added to the Word agenda when you build it on the Call agenda tab.</p>
         <div class="ri-bar">
-          <label>Data<select id="riSource"><option value="sample">Fictional sample data</option><option value="saved">My saved report data</option></select></label>
+          <label>Data<select id="riSource"><option value="saved">My saved report data</option><option value="sample">Fictional sample data</option></select></label>
           <label>Month<select id="riPeriod"></select></label>
           <label>Show<select id="riFilter"><option value="open">To review</option><option value="approved">Approved</option><option value="dismissed">Dismissed</option><option value="all">All</option></select></label>
         </div>
@@ -641,6 +660,20 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:720px}
         </details>
         <div id="riList"></div>
         <div class="ri-points"><div class="ph" style="margin:0 0 8px"><h2>Approved talking points</h2><button class="btn" type="button" id="riCopy">Copy</button></div><div id="riPoints"></div></div>
+      </section>
+
+      <section class="panel span12" id="msPanel" aria-label="Market surveys">
+        <div class="ph"><h2>Market surveys</h2><span class="label">By office and property</span></div>
+        <p class="sub">Every property has its own approved competitors and its own dated surveys. Rents are compared like for like by floor plan, and every figure shows its source, date and confidence. Nothing is collected automatically: figures come from earlier comp surveys, your manual entries and survey files you upload.</p>
+        <div class="ri-bar">
+          <label>Data<select id="msSource"><option value="saved">My saved data</option><option value="sample">Fictional sample data</option></select></label>
+          <label>Stale after (days)<input id="msStale" type="number" min="1" step="1" class="ms-num"></label>
+          <label>Material gap (%)<input id="msMat" type="number" min="0.5" step="0.5" class="ms-num"></label>
+          <label>Flag competitor rent cuts of ($)<input id="msChg" type="number" min="1" step="1" class="ms-num"></label>
+          <label class="ms-inline" style="align-self:end"><input id="msInAgenda" type="checkbox"> Add market findings to the Word agenda</label>
+        </div>
+        <p class="status-line" id="msMsg" aria-live="polite"></p>
+        <div id="msBody"></div>
       </section>
 
       <section class="panel span7" aria-label="Upload monthly reports">
@@ -1070,6 +1103,421 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:720px}
 
   const api = { analyze, talkingPoints, allPeriods, DEFAULT_TARGETS, TARGET_LABELS, SOURCES, EXPECTED, monthName, SAMPLE };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.RegionInsights = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script id="market-survey-engine">
+/* Market survey engine: per-property competitive sets, dated survey snapshots, like-for-like rent
+   comparison, effective rents, changes between surveys, and office / regional roll-ups.
+   Pure functions, no network. Every figure keeps its source, date and confidence.
+   Runs in the browser (window.MarketSurvey) and in Node (module.exports). */
+(function (root) {
+  'use strict';
+
+  const DEFAULTS = { staleDays: 30, materialityPct: 5, rentChangeMin: 25 };
+  const CONFIDENCE = ['verified', 'partially verified', 'unverified'];
+  const CONCESSION_TYPES = {
+    free_weeks: 'Weeks free', free_months: 'Months free', amount_off_once: 'One-time $ off',
+    amount_off_monthly: '$ off each month', percent_off_monthly: '% off each month', other: 'Other (not calculable)'
+  };
+  const MIDTOWN_OFFICE = 'Midtown';
+  const UNASSIGNED = 'Unassigned';
+
+  /* ---------- helpers ---------- */
+  const isNum = (v) => typeof v === 'number' && isFinite(v);
+  const money = (n) => (n < 0 ? '−' : '') + '$' + Math.abs(Math.round(n)).toLocaleString('en-US');
+  const signed = (n) => (n > 0 ? '+' : n < 0 ? '−' : '±') + '$' + Math.abs(Math.round(n)).toLocaleString('en-US');
+  const pct = (n) => (n > 0 ? '+' : n < 0 ? '−' : '') + Math.abs(Math.round(n * 10) / 10).toFixed(1) + '%';
+  const bedLabel = (b) => b === 0 ? 'Studio' : b + ' bed';
+  const norm = (s) => String(s || '').toLowerCase().replace(/&/g, ' and ').replace(/\b(apartments?|apts?|the|townhomes?|homes)\b/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
+  const normAddr = (s) => String(s || '').toLowerCase().replace(/\b(road|rd)\b/g, 'rd').replace(/\b(street|st)\b/g, 'st').replace(/\b(drive|dr)\b/g, 'dr').replace(/\b(boulevard|blvd)\b/g, 'blvd').replace(/[^a-z0-9]+/g, ' ').trim().split(' ').slice(0, 3).join(' ');
+  const slug = (s) => String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+  const isDate = (s) => /^\d{4}-\d{2}-\d{2}$/.test(String(s || '')) && !isNaN(Date.parse(s + 'T00:00:00Z'));
+  const dayDiff = (a, b) => Math.round((Date.parse(b + 'T00:00:00Z') - Date.parse(a + 'T00:00:00Z')) / 864e5);
+  const median = (a) => { const s = [...a].sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+  const mean = (a) => a.reduce((x, y) => x + y, 0) / a.length;
+  const fmtDate = (d) => { if (!isDate(d)) return String(d || ''); const [y, m, dd] = d.split('-').map(Number); return `${m}/${dd}/${y}`; };
+  function hash(s) { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36); }
+
+  /* ---------- registry: one record per real competitor ---------- */
+  // two entries are the same competitor when the names match, or the street addresses match
+  function findDuplicate(registry, cand) {
+    const n = norm(cand.name), a = cand.address ? normAddr(cand.address) : '';
+    return registry.find((c) => (n && norm(c.name) === n) || (a && c.address && normAddr(c.address) === a)) || null;
+  }
+  function newCompId(registry, name) {
+    let id = slug(name) || 'competitor', i = 2; const ids = new Set(registry.map((c) => c.id));
+    while (ids.has(id)) id = slug(name) + '-' + i++;
+    return id;
+  }
+
+  /* ---------- effective rent ---------- */
+  // returns {value, calc} when a verified, structured concession allows it; otherwise {value:null, note}
+  function effectiveRent(asking, c) {
+    if (!isNum(asking)) return { value: null, note: 'No asking rent.' };
+    if (!c || !c.type) return { value: asking, calc: 'No concession recorded, so effective = asking.' };
+    const v = c.value, t = c.termMonths;
+    const needTerm = (f) => isNum(t) && t > 0 ? f() : { value: null, note: 'Concession noted but the lease term is not recorded, so effective rent was not calculated.' };
+    switch (c.type) {
+      case 'free_weeks': return needTerm(() => { const fm = v * 7 / (365 / 12), e = asking * (t - fm) / t; return { value: e, calc: `${v} week(s) free = ${v} × 7 ÷ 30.42 = ${fm.toFixed(2)} months free; ${money(asking)} × (${t} − ${fm.toFixed(2)}) ÷ ${t} = ${money(e)}` }; });
+      case 'free_months': return needTerm(() => { const e = asking * (t - v) / t; return { value: e, calc: `${money(asking)} × (${t} − ${v}) ÷ ${t} = ${money(e)}` }; });
+      case 'amount_off_once': return needTerm(() => { const e = asking - v / t; return { value: e, calc: `${money(asking)} − ${money(v)} ÷ ${t} months = ${money(e)}` }; });
+      case 'amount_off_monthly': { const e = asking - v; return { value: e, calc: `${money(asking)} − ${money(v)} = ${money(e)}` }; }
+      case 'percent_off_monthly': { const e = asking * (1 - v / 100); return { value: e, calc: `${money(asking)} × (1 − ${v}%) = ${money(e)}` }; }
+      default: return { value: null, note: 'Concession described in text only, so effective rent was not calculated.' };
+    }
+  }
+
+  function describeConcession(c) {
+    if (!c) return 'None recorded';
+    if (c.text) return c.text;
+    const v = c.value;
+    return { free_weeks: `${v} week(s) free`, free_months: `${v} month(s) free`, amount_off_once: `${money(v)} off once`, amount_off_monthly: `${money(v)} off each month`, percent_off_monthly: `${v}% off each month` }[c.type] || CONCESSION_TYPES[c.type] || 'Concession';
+  }
+
+  /* ---------- validating one survey row (manual entry or CSV) ---------- */
+  function cleanRow(r, today) {
+    const errs = [], out = {};
+    const num = (k, label, { int = false, min = 0, allowZero = false } = {}) => {
+      const raw = r[k]; if (raw === '' || raw == null) { out[k] = null; return; } // blank = missing, never zero
+      const n = typeof raw === 'number' ? raw : Number(String(raw).replace(/[$,\s]/g, ''));
+      if (!isFinite(n) || (int && !Number.isInteger(n)) || n < min || (!allowZero && n === 0)) { errs.push(`${label} "${raw}" is not valid`); out[k] = null; } else out[k] = n;
+    };
+    out.compId = r.compId || null;
+    num('beds', 'Bedrooms', { int: true, allowZero: true }); if (out.beds == null && !errs.length) errs.push('Bedrooms is required (0 for a studio)');
+    if (out.beds != null && out.beds > 6) errs.push('Bedrooms must be 0–6');
+    num('baths', 'Bathrooms'); num('sqft', 'Square feet'); num('askingRent', 'Asking rent');
+    num('availableUnits', 'Available units', { int: true, allowZero: true });
+    out.plan = String(r.plan || '').trim().slice(0, 60);
+    out.moveIn = String(r.moveIn || '').trim().slice(0, 40);
+    out.parking = String(r.parking || '').trim().slice(0, 120); out.pets = String(r.pets || '').trim().slice(0, 120);
+    const list = (v) => (Array.isArray(v) ? v : String(v || '').split(/[;|,]/)).map((s) => String(s).trim()).filter(Boolean).slice(0, 30);
+    out.amenities = list(r.amenities); out.utilities = list(r.utilities);
+    out.url = String(r.url || '').trim(); if (out.url && !/^https?:\/\//i.test(out.url)) { errs.push('Source URL must start with http:// or https://'); out.url = ''; }
+    out.sourceLabel = String(r.sourceLabel || '').trim().slice(0, 120);
+    out.verifiedAt = String(r.verifiedAt || '').trim();
+    if (!isDate(out.verifiedAt)) errs.push('Last verified date is required (YYYY-MM-DD)');
+    else if (today && out.verifiedAt > today) errs.push('Last verified date is in the future');
+    out.confidence = CONFIDENCE.includes(String(r.confidence || '').toLowerCase()) ? String(r.confidence).toLowerCase() : 'unverified';
+    const ct = r.concessionType || (r.concession && r.concession.type) || '';
+    if (ct) {
+      if (!CONCESSION_TYPES[ct]) errs.push(`Concession type "${ct}" is not recognised`);
+      const cv = r.concessionValue ?? (r.concession && r.concession.value), tm = r.termMonths ?? (r.concession && r.concession.termMonths);
+      const c = { type: ct, value: cv === '' || cv == null ? null : Number(cv), termMonths: tm === '' || tm == null ? null : Number(tm), text: String(r.concessionText || (r.concession && r.concession.text) || '').trim().slice(0, 160) };
+      if (ct !== 'other' && !(isNum(c.value) && c.value > 0)) errs.push('Concession amount is required for this concession type');
+      if (c.termMonths != null && !(isNum(c.termMonths) && c.termMonths > 0)) errs.push('Lease term must be a positive number of months');
+      out.concession = c;
+    } else out.concession = r.concessionText ? { type: 'other', value: null, termMonths: null, text: String(r.concessionText).trim().slice(0, 160) } : null;
+    return { row: out, errors: errs };
+  }
+  // a row's identity within a survey: competitor + floor plan
+  const rowKey = (r) => [r.compId, r.beds, r.baths ?? '', r.sqft ?? '', (r.plan || '').toLowerCase()].join('|');
+
+  /* ---------- CSV import ---------- */
+  const CSV_COLUMNS = ['competitor', 'address', 'beds', 'baths', 'sqft', 'plan', 'asking_rent', 'concession_type', 'concession_value', 'lease_term_months', 'concession_text', 'available_units', 'move_in', 'amenities', 'utilities', 'parking', 'pets', 'distance_miles', 'source_url', 'verified_date', 'confidence'];
+  function parseCsv(text) {
+    const rows = []; let row = [], cell = '', q = false;
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (q) { if (ch === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; } else cell += ch; }
+      else if (ch === '"') q = true; else if (ch === ',') { row.push(cell); cell = ''; }
+      else if (ch === '\n' || ch === '\r') { if (ch === '\r' && text[i + 1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
+      else cell += ch;
+    }
+    if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+    const nonEmpty = rows.filter((r) => r.some((c) => c.trim() !== ''));
+    if (!nonEmpty.length) return { records: [], errors: ['The file is empty.'] };
+    const head = nonEmpty[0].map((h) => h.trim().toLowerCase().replace(/\s+/g, '_'));
+    const missing = ['competitor', 'beds', 'asking_rent', 'verified_date'].filter((c) => !head.includes(c));
+    if (missing.length) return { records: [], errors: ['Missing column(s): ' + missing.join(', ') + '. Download the template to see the expected columns.'] };
+    return { records: nonEmpty.slice(1).map((r, i) => ({ line: i + 2, ...Object.fromEntries(head.map((h, j) => [h, (r[j] || '').trim()])) })), errors: [], key: hash(nonEmpty.map((r) => r.map((c) => c.trim()).join(',')).join('\n')) };
+  }
+  // CSV records → {rows, newCompetitors, errors}; "subject" marks our own property's rents
+  function importRecords(records, { registry, subject, today }) {
+    const out = [], errors = [], newComps = [];
+    const reg = registry.slice(), seen = new Set();
+    for (const rec of records) {
+      const isSubject = /^(our property|subject)$/i.test(rec.competitor) || norm(rec.competitor) === norm(subject.name);
+      let compId = 'subject';
+      if (!isSubject) {
+        if (!rec.competitor) { errors.push(`Line ${rec.line}: competitor name is missing`); continue; }
+        const c = findDuplicate(reg, { name: rec.competitor, address: rec.address });
+        compId = c ? c.id : newCompId(reg, rec.competitor);
+      }
+      const { row, errors: e } = cleanRow({ compId, beds: rec.beds, baths: rec.baths, sqft: rec.sqft, plan: rec.plan, askingRent: rec.asking_rent, concessionType: rec.concession_type, concessionValue: rec.concession_value, termMonths: rec.lease_term_months, concessionText: rec.concession_text, availableUnits: rec.available_units, moveIn: rec.move_in, amenities: rec.amenities, utilities: rec.utilities, parking: rec.parking, pets: rec.pets, url: rec.source_url, verifiedAt: rec.verified_date, confidence: rec.confidence || 'unverified' }, today);
+      if (e.length) { errors.push(`Line ${rec.line}: ${e.join('; ')}`); continue; }
+      if (rec.distance_miles && isFinite(Number(rec.distance_miles))) row.distance = Number(rec.distance_miles);
+      const k = rowKey(row) + '|' + row.verifiedAt;
+      if (seen.has(k)) { errors.push(`Line ${rec.line}: duplicate of an earlier line (same competitor, floor plan and date)`); continue; }
+      if (!isSubject && !reg.some((c) => c.id === compId)) { const c = { id: compId, name: rec.competitor, address: rec.address || '', url: '', submarket: subject.submarket || '' }; reg.push(c); newComps.push(c); }
+      seen.add(k); out.push(row);
+    }
+    return { rows: out, newCompetitors: newComps, errors };
+  }
+
+  /* ---------- competitive set ---------- */
+  // candidates are existing registry entries not yet approved or rejected for this property,
+  // ranked by transparent factors; nothing is invented
+  function candidates(subject, registry, compSet) {
+    const taken = new Set([...(compSet.approved || []), ...(compSet.rejected || [])]);
+    const ours = subject.rents || {};
+    return registry.filter((c) => !taken.has(c.id) && c.id !== subject.id).map((c) => {
+      const why = []; let score = 0;
+      if (subject.submarket && c.submarket === subject.submarket) { score += 2; why.push('same submarket (' + c.submarket + ')'); }
+      const cr = c.rents || {};
+      ['b1', 'b2', 'b3'].forEach((b) => { if (isNum(ours[b]) && isNum(cr[b])) { const d = (cr[b] - ours[b]) / ours[b] * 100; if (Math.abs(d) <= 20) { score += 1; why.push(`${b[1]}-bed asking within 20% of ours (${pct(d)})`); } } });
+      if ((c.sets || []).includes(subject.id)) { score += 3; why.push('already in this property\'s earlier comp list'); }
+      return { comp: c, score, why };
+    }).filter((x) => x.score >= 2).sort((a, b) => b.score - a.score || a.comp.name.localeCompare(b.comp.name));
+  }
+  // Midtown's earlier comp list ("sets") seeds its approved set until one is saved
+  function effectiveCompSet(subject, registry, saved) {
+    if (saved && Array.isArray(saved.approved)) return { approved: saved.approved.filter((id) => registry.some((c) => c.id === id)), rejected: saved.rejected || [], distances: saved.distances || {}, saved: true };
+    return { approved: registry.filter((c) => (c.sets || []).includes(subject.id)).map((c) => c.id), rejected: [], distances: {}, saved: false };
+  }
+
+  /* ---------- snapshots ---------- */
+  // rows from the older starting-rent history ({date:{b1,b2,b3}}): bedroom count only, partially verified
+  function legacyRows(entity, compId) {
+    const out = [];
+    Object.entries(entity.history || {}).forEach(([d, r]) => {
+      if (!isDate(d)) return;
+      [[1, 'b1'], [2, 'b2'], [3, 'b3']].forEach(([beds, k]) => {
+        if (isNum(r && r[k])) out.push({ compId, beds, baths: null, sqft: null, plan: 'Starting rent', askingRent: r[k], concession: null, availableUnits: null, moveIn: '', amenities: [], utilities: [], parking: '', pets: '', url: entity.sourceUrl || '', sourceLabel: 'Earlier comp survey (starting rent by bedroom count)', verifiedAt: d, confidence: 'partially verified', legacy: true });
+      });
+    });
+    return out;
+  }
+  // all dated rows for this property: its own survey records plus the earlier history of its approved competitors
+  function rowsFor(subject, registry, compSet, surveys) {
+    const rows = [];
+    (surveys || []).filter((s) => s.propertyId === subject.id).forEach((s) => (s.rows || []).forEach((r) => rows.push({ ...r, verifiedAt: r.verifiedAt || s.date, surveyId: s.id, sourceLabel: r.sourceLabel || (s.source && s.source.label) || '' })));
+    const manualDates = new Set(rows.map((r) => r.compId + '|' + r.beds + '|' + r.verifiedAt));
+    const add = (e, id) => legacyRows(e, id).forEach((r) => { if (!manualDates.has(r.compId + '|' + r.beds + '|' + r.verifiedAt)) rows.push(r); });
+    add(subject, 'subject');
+    compSet.approved.forEach((id) => { const c = registry.find((x) => x.id === id); if (c) add(c, id); });
+    return rows;
+  }
+
+  /* ---------- analysis for one property ---------- */
+  function analyzeProperty({ property, registry, compSet: savedSet, surveys, today, settings }) {
+    const S = Object.assign({}, DEFAULTS, settings || {});
+    const compSet = effectiveCompSet(property, registry, savedSet);
+    const rows = rowsFor(property, registry, compSet, surveys);
+    const name = (id) => id === 'subject' ? property.name : (registry.find((c) => c.id === id) || {}).name || id;
+    const comp = (id) => registry.find((c) => c.id === id) || {};
+    const ageOf = (r) => dayDiff(r.verifiedAt, today);
+    const isStale = (r) => ageOf(r) > S.staleDays;
+    const usable = (r) => isNum(r.askingRent) && !isStale(r) && r.confidence !== 'unverified';
+
+    // latest date per competitor + bedroom count; one value per competitor (its lowest plan that day)
+    const byCompBeds = new Map();
+    rows.filter((r) => r.compId === 'subject' || compSet.approved.includes(r.compId)).forEach((r) => {
+      const k = r.compId + '|' + r.beds; if (!byCompBeds.has(k)) byCompBeds.set(k, []); byCompBeds.get(k).push(r);
+    });
+    const pick = (list) => { // lowest asking among rows of one date; manual entries over earlier history
+      const withRent = list.filter((r) => isNum(r.askingRent)); const pool = withRent.length ? withRent : list;
+      const manual = pool.filter((r) => !r.legacy); const p2 = manual.length ? manual : pool;
+      return p2.reduce((a, b) => (isNum(b.askingRent) && (!isNum(a.askingRent) || b.askingRent < a.askingRent) ? b : a));
+    };
+    const latest = [], changes = [];
+    byCompBeds.forEach((list) => {
+      const dates = [...new Set(list.map((r) => r.verifiedAt))].sort().reverse();
+      const cur = pick(list.filter((r) => r.verifiedAt === dates[0]));
+      const prevRows = dates[1] ? list.filter((r) => r.verifiedAt === dates[1]) : [];
+      const prev = prevRows.length ? pick(prevRows) : null;
+      const eff = effectiveRent(cur.askingRent, cur.concession);
+      latest.push({ ...cur, name: name(cur.compId), effective: eff, stale: isStale(cur), ageDays: ageOf(cur), prev });
+      if (prev && cur.compId !== 'subject') {
+        if (isNum(prev.askingRent) && isNum(cur.askingRent) && prev.askingRent !== cur.askingRent)
+          changes.push({ type: cur.askingRent < prev.askingRent ? 'rent_down' : 'rent_up', compId: cur.compId, name: name(cur.compId), beds: cur.beds, from: prev.askingRent, to: cur.askingRent, fromDate: prev.verifiedAt, toDate: cur.verifiedAt, url: cur.url || comp(cur.compId).url || '', source: cur.sourceLabel });
+        if (cur.concession && !prev.concession) changes.push({ type: 'concession_new', compId: cur.compId, name: name(cur.compId), beds: cur.beds, concession: cur.concession, fromDate: prev.verifiedAt, toDate: cur.verifiedAt, url: cur.url || comp(cur.compId).url || '', source: cur.sourceLabel });
+        if (!cur.concession && prev.concession) changes.push({ type: 'concession_ended', compId: cur.compId, name: name(cur.compId), beds: cur.beds, concession: prev.concession, fromDate: prev.verifiedAt, toDate: cur.verifiedAt, url: cur.url || '', source: cur.sourceLabel });
+      }
+    });
+    latest.sort((a, b) => a.beds - b.beds || (a.compId === 'subject' ? -1 : b.compId === 'subject' ? 1 : a.name.localeCompare(b.name)));
+
+    // like-for-like groups by bedroom count
+    const bedsList = [...new Set(latest.map((r) => r.beds))].sort((a, b) => a - b);
+    const groups = bedsList.map((beds) => {
+      const ours = latest.find((r) => r.compId === 'subject' && r.beds === beds) || null;
+      const comps = latest.filter((r) => r.compId !== 'subject' && r.beds === beds);
+      const use = comps.filter(usable), excluded = comps.filter((r) => !usable(r));
+      const asks = use.map((r) => r.askingRent), effs = use.filter((r) => isNum(r.effective.value)).map((r) => r.effective.value);
+      const n = asks.length;
+      const stat = (a) => a.length ? { n: a.length, min: Math.min(...a), max: Math.max(...a), median: a.length >= 3 ? median(a) : null, average: a.length >= 3 ? mean(a) : null } : null;
+      const g = { beds, label: bedLabel(beds), ours, comps, used: use, excluded, asking: stat(asks), effective: stat(effs), position: 'no data', sample: '' };
+      g.sample = n === 0 ? 'No current, usable competitor rents for this bedroom count.'
+        : n === 1 ? 'Only one competitor has a current rent for this bedroom count, so there is no market range or average.'
+        : n === 2 ? 'Two competitors: the range is shown, but two is too few for a median or average.'
+        : `${n} competitors with current rents.`;
+      if (excluded.length) g.sample += ` Left out: ${excluded.map((r) => `${r.name} (${r.stale ? `last verified ${fmtDate(r.verifiedAt)}, ${r.ageDays} days ago` : !isNum(r.askingRent) ? 'no rent published' : r.confidence})`).join('; ')}.`;
+      if (ours && isNum(ours.askingRent) && n >= 2) {
+        g.position = ours.askingRent > g.asking.max ? 'above range' : ours.askingRent < g.asking.min ? 'below range' : 'within range';
+        g.vsMin = ours.askingRent - g.asking.min; g.vsMax = ours.askingRent - g.asking.max;
+        if (g.asking.median != null) { g.vsMedian = ours.askingRent - g.asking.median; g.vsMedianPct = g.vsMedian / g.asking.median * 100; }
+        if (g.effective && g.effective.n >= 2) g.effPosition = ours.effective.value > g.effective.max ? 'above range' : ours.effective.value < g.effective.min ? 'below range' : 'within range';
+      } else if (ours && isNum(ours.askingRent) && n === 1) { g.position = 'one competitor'; g.vsOne = ours.askingRent - asks[0]; }
+      else if (!ours || !isNum(ours.askingRent)) g.position = 'our rent not on file';
+      return g;
+    });
+
+    // amenities: only among competitors that have amenity data
+    const withAm = [...new Set(latest.filter((r) => r.compId !== 'subject' && r.amenities && r.amenities.length).map((r) => r.compId))];
+    const amOf = (id) => new Set(latest.filter((r) => r.compId === id).flatMap((r) => r.amenities.map((a) => a.toLowerCase())));
+    const oursAm = new Set([...(property.amenities || []).map((a) => a.toLowerCase()), ...amOf('subject')]);
+    let amenities = null;
+    if (withAm.length >= 2 && oursAm.size) {
+      const count = {}; withAm.forEach((id) => amOf(id).forEach((a) => { count[a] = (count[a] || 0) + 1; }));
+      const spell = {}; latest.forEach((r) => (r.amenities || []).forEach((a) => { spell[a.toLowerCase()] ??= a; })); (property.amenities || []).forEach((a) => { spell[a.toLowerCase()] ??= a; });
+      amenities = {
+        comps: withAm.length,
+        disadvantages: Object.entries(count).filter(([a, k]) => k / withAm.length >= 0.5 && !oursAm.has(a)).map(([a, k]) => ({ amenity: spell[a] || a, have: k, of: withAm.length })),
+        advantages: [...oursAm].filter((a) => (count[a] || 0) / withAm.length < 0.5).map((a) => ({ amenity: spell[a] || a, have: count[a] || 0, of: withAm.length }))
+      };
+    }
+
+    const concessions = latest.filter((r) => r.compId !== 'subject' && r.concession && !r.stale);
+    const compDates = latest.filter((r) => r.compId !== 'subject').map((r) => r.verifiedAt).sort();
+    const lastSurvey = compDates.length ? compDates[compDates.length - 1] : null;
+    const oldest = compDates[0] || null;
+    const staleRows = latest.filter((r) => r.stale);
+
+    /* actionable findings for the agenda: each carries source, date and link */
+    const findings = [];
+    const F = (f) => findings.push({ propertyId: property.id, property: property.name, ...f });
+    changes.filter((c) => c.type === 'rent_down' && c.from - c.to >= S.rentChangeMin).forEach((c) => F({
+      kind: 'competitor_rent_down', text: `${c.name} lowered its ${bedLabel(c.beds).toLowerCase()} asking rent ${signed(c.to - c.from)} to ${money(c.to)} (was ${money(c.from)} on ${fmtDate(c.fromDate)}).`,
+      source: c.source || 'Market survey', date: c.toDate, url: c.url }));
+    changes.filter((c) => c.type === 'concession_new').forEach((c) => F({
+      kind: 'concession_new', text: `${c.name} now advertises a concession on ${bedLabel(c.beds).toLowerCase()} units: ${describeConcession(c.concession)}. None was recorded on ${fmtDate(c.fromDate)}.`,
+      source: c.source || 'Market survey', date: c.toDate, url: c.url }));
+    groups.forEach((g) => {
+      if ((g.position === 'above range' || g.position === 'below range') && g.ours) {
+        const gap = g.position === 'above range' ? g.vsMax : g.vsMin;
+        const gapPct = gap / (g.position === 'above range' ? g.asking.max : g.asking.min) * 100;
+        if (Math.abs(gapPct) >= S.materialityPct) F({
+          kind: 'our_rent_' + (g.position === 'above range' ? 'above' : 'below'),
+          text: `Our ${g.label.toLowerCase()} asking rent ${money(g.ours.askingRent)} is ${g.position === 'above range' ? 'above' : 'below'} the comparable range of ${money(g.asking.min)}–${money(g.asking.max)} (${g.asking.n} competitors) by ${signed(gap)} (${pct(gapPct)}).${g.effective && g.effective.n >= 2 && g.effective.min !== g.asking.min ? ` Effective range after concessions: ${money(g.effective.min)}–${money(g.effective.max)}.` : ''} For management review; not a pricing recommendation.`,
+          source: 'Market survey (asking rents)', date: lastSurvey, url: '' });
+      }
+    });
+    if (amenities) amenities.disadvantages.forEach((d) => F({ kind: 'amenity_gap', text: `${d.have} of ${d.of} competitors with amenity data list ${d.amenity}; it is not recorded for ${property.name}.`, source: 'Market survey (amenities)', date: lastSurvey, url: '' }));
+    if (!lastSurvey) F({ kind: 'survey_missing', text: 'No competitor survey data is on file, so no market comparison is possible.', source: 'Survey history', date: null, url: '' });
+    else if (dayDiff(lastSurvey, today) > S.staleDays) F({ kind: 'survey_stale', text: `The most recent competitor survey is from ${fmtDate(lastSurvey)} (${dayDiff(lastSurvey, today)} days ago), older than the ${S.staleDays}-day limit, so it can't support a reliable comparison.`, source: 'Survey history', date: lastSurvey, url: '' });
+    else if (staleRows.some((r) => r.compId !== 'subject')) F({ kind: 'survey_partly_stale', text: `${new Set(staleRows.filter((r) => r.compId !== 'subject').map((r) => r.name)).size} competitor(s) have rents older than ${S.staleDays} days and were left out of the comparison: ${[...new Set(staleRows.filter((r) => r.compId !== 'subject').map((r) => r.name))].join(', ')}.`, source: 'Survey history', date: oldest, url: '' });
+    const ourStale = latest.filter((r) => r.compId === 'subject' && r.stale);
+    if (ourStale.length) F({ kind: 'our_rent_stale', text: `Our own asking rent on file is from ${fmtDate(ourStale[0].verifiedAt)} (${ourStale[0].ageDays} days ago). Update it before comparing.`, source: 'Survey history', date: ourStale[0].verifiedAt, url: '' });
+
+    const dates = [...new Set(rows.filter((r) => r.compId === 'subject' || compSet.approved.includes(r.compId)).map((r) => r.verifiedAt))].sort().reverse();
+    return { property, compSet, rows, latest, groups, changes, concessions, amenities, findings, lastSurvey, staleRows, dates,
+      needsRefresh: !lastSurvey || dayDiff(lastSurvey, today) > S.staleDays || staleRows.length > 0 };
+  }
+
+  /* ---------- office and regional roll-ups (no cross-market averages) ---------- */
+  function officeOf(p) { return p.id === 'midtown' ? MIDTOWN_OFFICE : (p.office || UNASSIGNED); }
+  function summarize(analyses) {
+    const offices = new Map();
+    analyses.forEach((a) => {
+      const o = officeOf(a.property); if (!offices.has(o)) offices.set(o, []);
+      const pos = a.groups.filter((g) => ['above range', 'below range', 'within range'].includes(g.position)).map((g) => ({ beds: g.beds, label: g.label, position: g.position, n: g.asking.n }));
+      offices.get(o).push({
+        id: a.property.id, name: a.property.name, positions: pos,
+        above: pos.filter((x) => x.position === 'above range').map((x) => x.label), below: pos.filter((x) => x.position === 'below range').map((x) => x.label),
+        newConcessions: a.changes.filter((c) => c.type === 'concession_new').length, rentDrops: a.changes.filter((c) => c.type === 'rent_down').length,
+        needsRefresh: a.needsRefresh, lastSurvey: a.lastSurvey, competitors: a.compSet.approved.length, findings: a.findings.length
+      });
+    });
+    const order = (o) => o === MIDTOWN_OFFICE ? '0' : o === UNASSIGNED ? '2' : '1' + o;
+    const list = [...offices.entries()].sort((a, b) => order(a[0]).localeCompare(order(b[0]))).map(([office, props]) => ({
+      office, properties: props.sort((a, b) => a.name.localeCompare(b.name)),
+      above: props.filter((p) => p.above.length).length, below: props.filter((p) => p.below.length).length,
+      newConcessions: props.reduce((s, p) => s + p.newConcessions, 0), rentDrops: props.reduce((s, p) => s + p.rentDrops, 0),
+      needsRefresh: props.filter((p) => p.needsRefresh).length
+    }));
+    const all = list.flatMap((o) => o.properties);
+    return { offices: list, region: { properties: all.length, offices: list.length, above: all.filter((p) => p.above.length).length, below: all.filter((p) => p.below.length).length,
+      newConcessions: all.reduce((s, p) => s + p.newConcessions, 0), needsRefresh: all.filter((p) => p.needsRefresh).length, noCompetitors: all.filter((p) => !p.competitors).length } };
+  }
+
+  /* ---------- Word agenda: office → property → actionable findings ---------- */
+  function agendaGroups(analyses, excluded) {
+    const ex = excluded || {};
+    const s = summarize(analyses);
+    return s.offices.map((o) => {
+      const missing = [], properties = [];
+      o.properties.forEach((p) => {
+        const a = analyses.find((x) => x.property.id === p.id), fs = a.findings.filter((f) => !ex[findingId(f)]);
+        if (fs.some((f) => f.kind === 'survey_missing')) missing.push(p.name);
+        const pts = fs.filter((f) => f.kind !== 'survey_missing').map((f) => ({ text: f.text, source: f.source, date: f.date ? fmtDate(f.date) : 'no date', url: f.url || '' }));
+        if (pts.length) properties.push({ property: p.name, lastSurvey: a.lastSurvey, points: pts });
+      });
+      return { office: o.office, properties, missing };
+    }).filter((o) => o.properties.length || o.missing.length);
+  }
+  const findingId = (f) => f.propertyId + ':' + f.kind + ':' + hash(f.text);
+
+  /* ---------- fictional sample data (invented names and figures; for demos and tests) ---------- */
+  const SAMPLE = {
+    label: 'Fictional sample data', today: '2026-10-14',
+    properties: [
+      { id: 'midtown', name: 'Sample Midtown', office: 'Midtown', submarket: 'Sample North', rents: { b1: 1650, b2: 1950 }, amenities: ['In-unit laundry', 'Fitness center', 'Pet friendly'],
+        history: { '2026-10-10': { b1: 1650, b2: 1950 } }, sourceUrl: 'https://example.com/sample-midtown' },
+      { id: 'oak-hollow', name: 'Oak Hollow (sample)', office: 'Sample Office A', submarket: 'Sample East', rents: { b1: 1200, b2: 1450 }, amenities: ['Pool', 'Carport'],
+        history: { '2026-10-08': { b1: 1200, b2: 1450 } }, sourceUrl: 'https://example.com/oak-hollow' },
+      { id: 'pine-terrace', name: 'Pine Terrace (sample)', office: 'Sample Office A', submarket: 'Sample East', rents: { b2: 1300 }, amenities: [],
+        history: { '2026-08-01': { b2: 1300 } }, sourceUrl: 'https://example.com/pine-terrace' },
+      { id: 'willow-court', name: 'Willow Court (sample)', office: 'Sample Office B', submarket: 'Sample South', rents: { b1: 1100, b2: 1350 }, amenities: ['Garage'],
+        history: { '2026-10-09': { b1: 1100, b2: 1350 } }, sourceUrl: 'https://example.com/willow-court' }
+    ],
+    registry: [
+      { id: 'alpha-commons', name: 'Alpha Commons (sample)', address: '1 Sample Way', submarket: 'Sample North', url: 'https://example.com/alpha' },
+      { id: 'beta-place', name: 'Beta Place (sample)', address: '2 Sample Way', submarket: 'Sample North', url: 'https://example.com/beta' },
+      { id: 'gamma-flats', name: 'Gamma Flats (sample)', address: '3 Sample Way', submarket: 'Sample North', url: 'https://example.com/gamma' },
+      { id: 'delta-gardens', name: 'Delta Gardens (sample)', address: '4 Sample Way', submarket: 'Sample East', url: 'https://example.com/delta' },
+      { id: 'echo-ridge', name: 'Echo Ridge (sample)', address: '5 Sample Way', submarket: 'Sample East', url: 'https://example.com/echo' },
+      { id: 'fox-run', name: 'Fox Run (sample)', address: '6 Sample Way', submarket: 'Sample South', url: 'https://example.com/foxrun' },
+      { id: 'glen-park', name: 'Glen Park (sample)', address: '7 Sample Way', submarket: 'Sample South', url: 'https://example.com/glen' },
+      { id: 'hill-view', name: 'Hill View (sample)', address: '8 Sample Way', submarket: 'Sample South', url: 'https://example.com/hill' }
+    ],
+    compSets: {
+      midtown: { approved: ['alpha-commons', 'beta-place', 'gamma-flats'], rejected: [], distances: { 'alpha-commons': 0.8, 'beta-place': 1.4, 'gamma-flats': 2.1 } },
+      'oak-hollow': { approved: ['delta-gardens', 'echo-ridge'], rejected: [], distances: { 'delta-gardens': 0.6, 'echo-ridge': 1.9 } },
+      'pine-terrace': { approved: ['echo-ridge'], rejected: [], distances: { 'echo-ridge': 0.4 } },
+      'willow-court': { approved: ['fox-run', 'glen-park', 'hill-view'], rejected: [], distances: { 'fox-run': 1.1, 'glen-park': 2.6, 'hill-view': 3.0 } }
+    },
+    surveys: [
+      { id: 'midtown__2026-09-12', propertyId: 'midtown', date: '2026-09-12', source: { type: 'manual', label: 'Sample manual survey' }, rows: [
+        { compId: 'alpha-commons', beds: 1, baths: 1, sqft: 760, plan: 'A1', askingRent: 1580, concession: null, amenities: ['In-unit laundry', 'Fitness center'], utilities: ['Water'], parking: 'Surface, free', pets: 'Cats and dogs, $35/mo', url: 'https://example.com/alpha', verifiedAt: '2026-09-12', confidence: 'verified' },
+        { compId: 'alpha-commons', beds: 2, baths: 2, sqft: 1080, plan: 'B2', askingRent: 1890, concession: null, amenities: ['In-unit laundry', 'Fitness center'], utilities: ['Water'], parking: 'Surface, free', pets: 'Cats and dogs, $35/mo', url: 'https://example.com/alpha', verifiedAt: '2026-09-12', confidence: 'verified' },
+        { compId: 'beta-place', beds: 2, baths: 2, sqft: 1120, plan: 'Two Bed', askingRent: 2010, concession: null, amenities: ['In-unit laundry', 'Garage'], utilities: [], parking: 'Garage $100/mo', pets: 'Dogs under 50 lb', url: 'https://example.com/beta', verifiedAt: '2026-09-12', confidence: 'verified' }
+      ] },
+      { id: 'midtown__2026-10-10', propertyId: 'midtown', date: '2026-10-10', source: { type: 'manual', label: 'Sample manual survey' }, rows: [
+        { compId: 'subject', beds: 1, baths: 1, sqft: 820, plan: 'Plan A', askingRent: 1650, concession: null, amenities: [], utilities: [], parking: '', pets: '', url: 'https://example.com/sample-midtown', verifiedAt: '2026-10-10', confidence: 'verified' },
+        { compId: 'subject', beds: 2, baths: 2, sqft: 1205, plan: 'Plan H', askingRent: 1950, concession: null, amenities: [], utilities: [], parking: '', pets: '', url: 'https://example.com/sample-midtown', verifiedAt: '2026-10-10', confidence: 'verified' },
+        { compId: 'alpha-commons', beds: 1, baths: 1, sqft: 760, plan: 'A1', askingRent: 1540, concession: null, amenities: ['In-unit laundry', 'Fitness center'], utilities: ['Water'], parking: 'Surface, free', pets: 'Cats and dogs, $35/mo', url: 'https://example.com/alpha', verifiedAt: '2026-10-10', confidence: 'verified' },
+        { compId: 'alpha-commons', beds: 2, baths: 2, sqft: 1080, plan: 'B2', askingRent: 1825, concession: null, availableUnits: 3, moveIn: 'Now', amenities: ['In-unit laundry', 'Fitness center'], utilities: ['Water'], parking: 'Surface, free', pets: 'Cats and dogs, $35/mo', url: 'https://example.com/alpha', verifiedAt: '2026-10-10', confidence: 'verified' },
+        { compId: 'beta-place', beds: 2, baths: 2, sqft: 1120, plan: 'Two Bed', askingRent: 2010, concession: { type: 'free_weeks', value: 6, termMonths: 13, text: '6 weeks free on a 13-month lease' }, availableUnits: 5, moveIn: 'Nov 1', amenities: ['In-unit laundry', 'Garage'], utilities: [], parking: 'Garage $100/mo', pets: 'Dogs under 50 lb', url: 'https://example.com/beta', verifiedAt: '2026-10-10', confidence: 'verified' },
+        { compId: 'gamma-flats', beds: 2, baths: 1, sqft: 950, plan: '2x1', askingRent: 1760, concession: null, amenities: ['Garage', 'Pool'], utilities: ['Heat', 'Water'], parking: 'Garage included', pets: 'No pets', url: 'https://example.com/gamma', verifiedAt: '2026-10-11', confidence: 'partially verified' },
+        { compId: 'gamma-flats', beds: 0, baths: 1, sqft: 520, plan: 'Studio', askingRent: 1190, concession: null, amenities: ['Garage', 'Pool'], utilities: ['Heat', 'Water'], parking: '', pets: 'No pets', url: 'https://example.com/gamma', verifiedAt: '2026-10-11', confidence: 'partially verified' }
+      ] },
+      { id: 'oak-hollow__2026-10-08', propertyId: 'oak-hollow', date: '2026-10-08', source: { type: 'upload', label: 'Sample uploaded survey' }, rows: [
+        { compId: 'delta-gardens', beds: 2, baths: 1, sqft: 900, plan: '2x1', askingRent: 1395, concession: null, amenities: ['Pool'], utilities: [], parking: '', pets: '', url: 'https://example.com/delta', verifiedAt: '2026-10-08', confidence: 'verified' },
+        { compId: 'echo-ridge', beds: 2, baths: 1, sqft: 880, plan: 'B', askingRent: null, concession: null, amenities: [], utilities: [], parking: '', pets: '', url: 'https://example.com/echo', verifiedAt: '2026-10-08', confidence: 'verified' }
+      ] },
+      { id: 'pine-terrace__2026-07-30', propertyId: 'pine-terrace', date: '2026-07-30', source: { type: 'manual', label: 'Sample manual survey' }, rows: [
+        { compId: 'echo-ridge', beds: 2, baths: 1, sqft: 880, plan: 'B', askingRent: 1325, concession: null, amenities: [], utilities: [], parking: '', pets: '', url: 'https://example.com/echo', verifiedAt: '2026-07-30', confidence: 'verified' }
+      ] },
+      { id: 'willow-court__2026-10-09', propertyId: 'willow-court', date: '2026-10-09', source: { type: 'manual', label: 'Sample manual survey' }, rows: [
+        { compId: 'fox-run', beds: 2, baths: 1, sqft: 940, plan: '2A', askingRent: 1240, concession: null, amenities: [], utilities: [], parking: '', pets: '', url: 'https://example.com/foxrun', verifiedAt: '2026-10-09', confidence: 'verified' },
+        { compId: 'glen-park', beds: 2, baths: 1, sqft: 990, plan: 'Glen 2', askingRent: 1270, concession: null, amenities: [], utilities: [], parking: '', pets: '', url: 'https://example.com/glen', verifiedAt: '2026-10-09', confidence: 'verified' },
+        { compId: 'hill-view', beds: 2, baths: 1, sqft: 900, plan: 'Two', askingRent: 1150, concession: null, amenities: [], utilities: [], parking: '', pets: '', url: '', sourceLabel: 'Phone call, not confirmed in writing', verifiedAt: '2026-10-09', confidence: 'unverified' }
+      ] }
+    ]
+  };
+
+  const api = { describeConcession, DEFAULTS, CONFIDENCE, CONCESSION_TYPES, CSV_COLUMNS, MIDTOWN_OFFICE, UNASSIGNED, findDuplicate, newCompId, effectiveRent, cleanRow, rowKey, parseCsv, importRecords,
+    candidates, effectiveCompSet, legacyRows, rowsFor, analyzeProperty, summarize, agendaGroups, findingId, officeOf, fmtDate, bedLabel, hash, SAMPLE };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.MarketSurvey = api;
 })(typeof window !== 'undefined' ? window : globalThis);
 </script>
 <script>
@@ -1632,10 +2080,10 @@ function renderReportLog(){
   $("#reportLog").innerHTML=rgReports.length?rgReports.map(r=>`<li><span><b>${esc(REPORT_LABEL[r.type]||r.type)}</b> · ${monthLabel(r.month)}<br><small>${esc(r.fileName||"")}${r.notes?" · "+esc(r.notes):""}</small></span><small>${r.matched||0} matched${r.unmatched?.length?" · "+r.unmatched.length+" not matched":""}</small></li>`).join("")
     :`<li><small>No reports loaded yet. Your first drop will show up here.</small></li>`;
 }
-function renderRegion(){renderMidtown();if($("#viewRegion").hidden)return;renderRegionKpis();renderScorecard();renderComps();renderReportLog();renderSubChart();renderInsights()}
+function renderRegion(){renderMidtown();if($("#viewRegion").hidden)return;renderRegionKpis();renderScorecard();renderComps();renderReportLog();renderSubChart();renderInsights();renderMarket()}
 /* ============ Regional manager insights (local rules engine; nothing leaves the page) ============ */
 const RI=window.RegionInsights;
-const riState=Object.assign({source:"sample",period:"",filter:"open",targets:{},approvals:{}},store.get("cd.thomas.insights",{}));
+const riState=Object.assign({source:"saved",period:"",filter:"open",targets:{},approvals:{}},store.get("cd.thomas.insights",{}));
 const riSave=()=>store.set("cd.thomas.insights",riState);
 let riResult={period:null,findings:[],byProperty:[]},riTargetsBuilt=false;
 const riProps=()=>riState.source==="sample"?RI.SAMPLE.properties:rgProps.map(p=>({id:p.id,name:p.name,months:p.months||{}}));
@@ -1719,6 +2167,249 @@ $("#riCopy").addEventListener("click",async()=>{
 window.__regionTalkingPoints=()=>{
   riRun();const groups=RI.talkingPoints(riResult,riApprovals());if(!groups.length)return null;
   return {talkingPoints:groups,talkingPointsNote:`Approved on the Region tab for ${RI.monthName(riResult.period)}. Generated by local rules from the figures on file; confirm each figure before the call.`+(riState.source==="sample"?" FICTIONAL SAMPLE DATA: delete this section before sending.":"")};
+};
+
+/* ============ Market surveys: one competitive set and survey history per property ============ */
+const MS=window.MarketSurvey;
+const msPref=Object.assign({source:"saved",staleDays:30,materialityPct:5,rentChangeMin:25,open:"",excluded:{},inAgenda:true},store.get("cd.thomas.market",{}));
+const msSavePref=()=>store.set("cd.thomas.market",msPref);
+let msCompSets={},msSurveys=[],msSample=null,msImport=null,msEdit=null,msMsg="",msCandOpen=false;
+const msDl=(window.claude?.use?.("downloads")??Promise.resolve(null)).catch(()=>null);
+const msToday=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+function msData(){
+  if(msPref.source==="sample"){msSample??=structuredClone(MS.SAMPLE);return {props:msSample.properties,registry:msSample.registry,sets:msSample.compSets,surveys:msSample.surveys,today:MS.SAMPLE.today,sample:true}}
+  return {props:rgProps,registry:rgComps.map(c=>({...c,url:c.url||c.sourceUrl||""})),sets:msCompSets,surveys:msSurveys,today:msToday(),sample:false};
+}
+const msSettings=()=>({staleDays:+msPref.staleDays||30,materialityPct:+msPref.materialityPct||5,rentChangeMin:+msPref.rentChangeMin||25});
+const msAnalyses=(D=msData())=>D.props.map(p=>MS.analyzeProperty({property:p,registry:D.registry,compSet:D.sets[p.id]||null,surveys:D.surveys,today:D.today,settings:msSettings()}));
+// one write path: sample edits stay in this page until reload; real edits go to the dashboard's database
+async function msWrite(coll,id,data,merge){
+  const D=msData();
+  if(D.sample){
+    if(coll==="compSets")msSample.compSets[id]=data;
+    else if(coll==="surveys"){const i=msSample.surveys.findIndex(s=>s.id===id);if(i>=0)msSample.surveys[i]={id,...data};else msSample.surveys.push({id,...data})}
+    else if(coll==="comps"){const i=msSample.registry.findIndex(c=>c.id===id);if(i>=0)Object.assign(msSample.registry[i],data);else msSample.registry.push({id,...data})}
+    else if(coll==="properties")Object.assign(msSample.properties.find(p=>p.id===id),data);
+    renderMarket();return true;
+  }
+  if(!rgDb){toast("Saving needs the dashboard open on claude.ai while signed in.");return false}
+  try{if(merge)await rgDb.doc(coll+"/"+id).update(data);else await rgDb.doc(coll+"/"+id).set(data);return true}
+  catch(e){toast(e.code==="quota_exceeded"?"The dashboard's storage is full.":"That didn't save ("+(e.code||"error")+"). Try again.");return false}
+}
+const msProp=(D,id)=>D.props.find(p=>p.id===id);
+const msSet=(D,p)=>MS.effectiveCompSet(p,D.registry,D.sets[p.id]);
+async function msSaveSet(D,p,set){return msWrite("compSets",p.id,{approved:set.approved,rejected:set.rejected,distances:set.distances||{},updatedAt:new Date().toISOString()})}
+const posTag=g=>{const c=g.position==="above range"?"t-bad":g.position==="below range"?"t-warn":g.position==="within range"?"t-good":"";return `<span class="tag ${c}" title="${esc(g.sample)}">${esc(g.label)}: ${esc(g.position)}</span>`};
+const confTag=r=>`<span class="tag ${r.confidence==="verified"?"t-good":r.confidence==="unverified"?"t-bad":"t-warn"}">${esc(r.confidence)}</span>${r.stale?' <span class="tag t-bad">stale</span>':""}`;
+const m$=v=>typeof v==="number"&&isFinite(v)?"$"+Math.round(v).toLocaleString():'<span class="dash" title="Not published or not recorded">—</span>';
+
+function renderMarket(){
+  if(!$("#msPanel"))return;
+  const D=msData(),an=msAnalyses(D),sum=MS.summarize(an);
+  $("#msSource").value=msPref.source;$("#msStale").value=msPref.staleDays;$("#msMat").value=msPref.materialityPct;$("#msChg").value=msPref.rentChangeMin;$("#msInAgenda").checked=!!msPref.inAgenda;
+  $("#msMsg").textContent=msMsg;
+  if(!D.props.length){$("#msBody").innerHTML=`<p class="empty-state">${D.sample?"No sample data.":"Your communities are still loading, or can't be reached in this view."}</p>`;return}
+  const open=msPref.open&&an.find(a=>a.property.id===msPref.open);
+  $("#msBody").innerHTML=open?msPropertyPage(D,open):msOverview(sum,D,an);
+}
+function msOverview(sum,D,an){
+  const r=sum.region;
+  return `<div class="ms-region"><b>Region:</b> ${r.offices} office${r.offices===1?"":"s"}, ${r.properties} properties. ${r.above} priced above their own comparable range, ${r.below} below. ${r.newConcessions} new competitor concession${r.newConcessions===1?"":"s"}. ${r.needsRefresh} survey${r.needsRefresh===1?"":"s"} need refreshing. ${r.noCompetitors} propert${r.noCompetitors===1?"y has":"ies have"} no approved competitors yet.
+    <small>Each property is compared only with its own approved competitors. There is no region-wide market average, because these are different rental markets.${D.sample?" Showing fictional sample data.":""}</small></div>`+
+  sum.offices.map(o=>{
+    const ab=o.properties.filter(p=>p.above.length),be=o.properties.filter(p=>p.below.length),rf=o.properties.filter(p=>p.needsRefresh);
+    const line=[ab.length?`Above range: ${ab.map(p=>p.name+" ("+p.above.join(", ")+")").join("; ")}.`:"",be.length?`Below range: ${be.map(p=>p.name+" ("+p.below.join(", ")+")").join("; ")}.`:"",
+      o.newConcessions?`${o.newConcessions} new competitor concession${o.newConcessions>1?"s":""}.`:"",o.rentDrops?`${o.rentDrops} competitor rent cut${o.rentDrops>1?"s":""}.`:"",rf.length?`Survey needs refreshing: ${rf.map(p=>p.name).join(", ")}.`:""].filter(Boolean).join(" ")||"No pricing gaps or competitor changes flagged.";
+    return `<section class="ms-office"><div class="ri-ph"><h3>${esc(o.office)}${o.office===MS.MIDTOWN_OFFICE?' <span class="label">kept separate</span>':""}</h3><span class="label">${o.properties.length} propert${o.properties.length===1?"y":"ies"}</span></div>
+      <p class="ms-line">${esc(line)}</p>
+      <div class="tbl-wrap"><table class="tbl ms-tbl"><thead><tr><th>Property</th><th class="num">Competitors</th><th>Last survey</th><th>Position by floor plan</th><th>Changes</th><th class="num">Findings</th><th></th></tr></thead><tbody>
+      ${o.properties.map(p=>{const a=an.find(x=>x.property.id===p.id);return `<tr><td><b>${esc(p.name)}</b></td><td class="num">${p.competitors}</td>
+        <td>${p.lastSurvey?esc(MS.fmtDate(p.lastSurvey)):'<span class="dash">None</span>'}${p.needsRefresh?' <span class="tag t-bad">refresh</span>':""}</td>
+        <td>${a.groups.filter(g=>g.ours).map(posTag).join(" ")||'<span class="dash">—</span>'}</td>
+        <td><small>${[p.newConcessions?p.newConcessions+" new concession(s)":"",p.rentDrops?p.rentDrops+" rent cut(s)":""].filter(Boolean).join(", ")||"—"}</small></td>
+        <td class="num">${p.findings}</td><td><button class="btn" type="button" data-ms="open" data-id="${esc(p.id)}">Open survey</button></td></tr>`}).join("")}
+      </tbody></table></div></section>`}).join("");
+}
+function msPropertyPage(D,a){
+  const p=a.property,set=a.compSet,reg=D.registry,name=id=>(reg.find(c=>c.id===id)||{}).name||id;
+  const offices=[...new Set([...D.props.map(x=>MS.officeOf(x)),MS.UNASSIGNED])].filter(o=>o!==MS.MIDTOWN_OFFICE).sort();
+  const cands=MS.candidates(p,reg,set),fid=f=>MS.findingId(f);
+  const latest=a.latest,ex=msPref.excluded;
+  const rowsHtml=latest.map((r,i)=>{const c=reg.find(x=>x.id===r.compId)||{},dist=r.compId==="subject"?"":set.distances?.[r.compId];
+    return `<tr class="${r.compId==="subject"?"yd":""}"><td><b>${esc(r.name)}</b><small>${esc(r.compId==="subject"?(p.address||""):(c.address||""))}</small></td>
+    <td class="num">${r.compId==="subject"?"—":typeof dist==="number"?dist+" mi":'<span class="dash" title="Not entered">—</span>'}</td>
+    <td>${esc(MS.bedLabel(r.beds))}${r.baths!=null?" / "+r.baths+" ba":""}${r.sqft!=null?" / "+r.sqft.toLocaleString()+" sf":""}<small>${esc(r.plan||"")}</small></td>
+    <td class="num">${m$(r.askingRent)}</td>
+    <td class="num" title="${esc(r.effective.calc||r.effective.note||"")}">${r.effective.value!=null?m$(r.effective.value):'<span class="dash" title="'+esc(r.effective.note||"")+'">n/c</span>'}</td>
+    <td><small>${r.availableUnits!=null?r.availableUnits+" available":"—"}${r.moveIn?" · "+esc(r.moveIn):""}</small></td>
+    <td><small>${esc(MS.describeConcession(r.concession))}</small></td>
+    <td><small>${esc((r.amenities||[]).join(", ")||"—")}</small></td><td><small>${esc((r.utilities||[]).join(", ")||"—")}</small></td>
+    <td><small>${esc([r.parking,r.pets].filter(Boolean).join(" · ")||"—")}</small></td>
+    <td><small>${r.url?`<a href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.sourceLabel||"Source")}</a>`:esc(r.sourceLabel||"—")}</small></td>
+    <td><small>${esc(MS.fmtDate(r.verifiedAt))}</small></td><td>${confTag(r)}</td>
+    <td><button class="btn" type="button" data-ms="edit" data-i="${i}">Correct</button></td></tr>`}).join("");
+  const grp=a.groups.map(g=>`<tr><td><b>${esc(g.label)}</b></td><td class="num">${g.ours?m$(g.ours.askingRent):'<span class="dash">not on file</span>'}</td><td class="num">${g.asking?g.asking.n:0}</td>
+    <td class="num">${g.asking?m$(g.asking.min)+"–"+m$(g.asking.max):"—"}</td><td class="num">${g.asking&&g.asking.median!=null?m$(g.asking.median):"—"}</td><td class="num">${g.asking&&g.asking.average!=null?m$(g.asking.average):"—"}</td>
+    <td class="num">${g.effective?m$(g.effective.min)+"–"+m$(g.effective.max):"—"}</td><td class="num">${g.effective&&g.effective.median!=null?m$(g.effective.median):"—"}</td>
+    <td>${posTag(g)}${g.vsMedian!=null?`<small>${g.vsMedian>=0?"+":"−"}$${Math.abs(Math.round(g.vsMedian)).toLocaleString()} vs median (${g.vsMedianPct>=0?"+":"−"}${Math.abs(g.vsMedianPct).toFixed(1)}%)</small>`:g.vsOne!=null?`<small>${g.vsOne>=0?"+":"−"}$${Math.abs(Math.round(g.vsOne)).toLocaleString()} vs the one competitor</small>`:""}</td></tr>
+    <tr class="ms-note"><td colspan="9"><small>${esc(g.sample)}</small></td></tr>`).join("");
+  const effCalcs=latest.filter(r=>r.concession).map(r=>`<li>${esc(r.name)}, ${esc(MS.bedLabel(r.beds))}: ${esc(r.effective.calc||r.effective.note)}</li>`).join("");
+  const chg=a.changes.map(c=>`<li>${esc(c.name)}, ${esc(MS.bedLabel(c.beds))}: ${c.type==="rent_down"||c.type==="rent_up"?`asking rent ${m$(c.from)} → ${m$(c.to)}`:c.type==="concession_new"?"new concession: "+esc(MS.describeConcession(c.concession)):"concession ended: "+esc(MS.describeConcession(c.concession))} <small>${esc(MS.fmtDate(c.fromDate))} → ${esc(MS.fmtDate(c.toDate))}</small></li>`).join("");
+  const am=a.amenities;
+  const e=msEdit&&msEdit.pid===p.id?msEdit.row:{compId:"",beds:"",baths:"",sqft:"",plan:"",askingRent:"",concession:null,availableUnits:"",moveIn:"",amenities:[],utilities:[],parking:"",pets:"",url:"",sourceLabel:"",verifiedAt:D.today,confidence:"verified"};
+  const v=x=>x==null?"":esc(x);
+  const opts=[["subject",p.name+" (our property)"],...set.approved.map(id=>[id,name(id)]),...reg.filter(c=>!set.approved.includes(c.id)).map(c=>[c.id,c.name+" (not approved)"])];
+  return `<div class="ms-ph"><button class="btn" type="button" data-ms="back">← All properties</button><h3>${esc(p.name)}</h3>
+    ${p.id==="midtown"?'<span class="label">Midtown office (kept separate)</span>':`<label class="ms-inline">Office <select data-ms-office>${offices.map(o=>`<option ${MS.officeOf(p)===o?"selected":""}>${esc(o)}</option>`).join("")}<option value="__new">New office…</option></select></label>`}
+    <span class="label">Last competitor survey: ${a.lastSurvey?esc(MS.fmtDate(a.lastSurvey)):"none"}</span>${a.needsRefresh?'<span class="tag t-bad">Needs refreshing</span>':""}</div>
+
+  <section class="ms-sec"><h4>Competitive set</h4><p class="sub">Only approved competitors are used. This set is saved for ${esc(p.name)} and reused for every future survey until you change it.${set.saved?"":" (Not saved yet: approve or remove a competitor to save it.)"}</p>
+    ${set.approved.length?`<div class="tbl-wrap"><table class="tbl ms-tbl"><thead><tr><th>Approved competitor</th><th>Submarket</th><th>Distance (mi)</th><th></th></tr></thead><tbody>${set.approved.map(id=>{const c=reg.find(x=>x.id===id)||{};return `<tr><td><b>${esc(c.name||id)}</b><small>${esc(c.address||"")}</small></td><td>${esc(c.submarket||"")}</td><td><input class="ms-num" type="number" step="0.1" min="0" data-ms-dist="${esc(id)}" value="${set.distances?.[id]??""}" placeholder="Not entered" aria-label="Distance to ${esc(c.name||id)}"></td><td><button class="btn" type="button" data-ms="remove" data-id="${esc(id)}">Remove</button></td></tr>`}).join("")}</tbody></table></div>`:'<p class="ri-none">No approved competitors yet.</p>'}
+    ${cands.length?`<details class="ms-det" data-ms-cands ${!set.approved.length||msCandOpen?"open":""}><summary>Suggested from the competitor list (${cands.length})</summary><ul class="ms-cands">${cands.slice(0,15).map(x=>`<li><b>${esc(x.comp.name)}</b> <small>${esc(x.comp.address||"")} · ${esc(x.why.join("; "))}</small> <button class="btn" type="button" data-ms="approve" data-id="${esc(x.comp.id)}">Approve</button> <button class="btn" type="button" data-ms="reject" data-id="${esc(x.comp.id)}">Not comparable</button></li>`).join("")}</ul><p class="sub" style="margin:0">Suggestions come only from competitors already on file, ranked by same submarket, similar starting rents for the same bedroom count, and earlier comp lists. Check floor plans and amenities before approving.</p></details>`:""}
+    ${set.rejected.length?`<details class="ms-det"><summary>Not comparable (${set.rejected.length})</summary><ul class="ms-cands">${set.rejected.map(id=>`<li>${esc(name(id))} <button class="btn" type="button" data-ms="restore" data-id="${esc(id)}">Restore</button></li>`).join("")}</ul></details>`:""}
+    <form class="ms-form" data-ms-form="comp"><b>Add a competitor</b><input name="name" placeholder="Community name" required><input name="address" placeholder="Street address"><input name="url" placeholder="Website or listing URL"><input name="distance" type="number" step="0.1" min="0" placeholder="Distance (mi)"><button class="btn primary" type="submit">Add and approve</button></form>
+  </section>
+
+  <section class="ms-sec"><h4>Market survey</h4><p class="sub">Latest figures for our property and each approved competitor, one row per floor plan. Rents older than ${msSettings().staleDays} days are marked stale and left out of the comparison. A dash means not published or not recorded, which is different from $0. n/c means a concession is listed but effective rent can't be calculated.</p>
+    ${latest.length?`<div class="tbl-wrap"><table class="tbl ms-tbl ms-wide"><thead><tr><th>Competitor</th><th class="num">Distance</th><th>Floor plan</th><th class="num">Advertised</th><th class="num">Effective</th><th>Availability</th><th>Concessions</th><th>Amenities</th><th>Utilities</th><th>Parking · pets</th><th>Source</th><th>Last verified</th><th>Confidence</th><th></th></tr></thead><tbody>${rowsHtml}</tbody></table></div>`:'<p class="ri-none">No survey figures on file. Add entries below or upload a survey file.</p>'}
+    ${effCalcs?`<p class="sub" style="margin:8px 0 0"><b>Effective rent calculations</b></p><ul class="ms-list">${effCalcs}</ul>`:""}
+  </section>
+
+  <section class="ms-sec"><h4>Comparison by floor plan</h4><p class="sub">Like for like: our rent for each bedroom count against competitors' rents for the same bedroom count. Each competitor counts once, at its lowest current plan with that bedroom count. Ranges need 2 or more competitors; medians and averages need 3 or more.</p>
+    ${a.groups.length?`<div class="tbl-wrap"><table class="tbl ms-tbl"><thead><tr><th>Floor plan</th><th class="num">Ours</th><th class="num">Comps</th><th class="num">Asking range</th><th class="num">Median</th><th class="num">Average</th><th class="num">Effective range</th><th class="num">Eff. median</th><th>Our position</th></tr></thead><tbody>${grp}</tbody></table></div>`:'<p class="ri-none">Nothing to compare yet.</p>'}
+    <div class="ms-two"><div><b>Changes since the previous survey</b>${chg?`<ul class="ms-list">${chg}</ul>`:'<p class="ri-none">No earlier survey to compare, or nothing changed.</p>'}</div>
+    <div><b>Current competitor concessions</b>${a.concessions.length?`<ul class="ms-list">${a.concessions.map(r=>`<li>${esc(r.name)}, ${esc(MS.bedLabel(r.beds))}: ${esc(MS.describeConcession(r.concession))}</li>`).join("")}</ul>`:'<p class="ri-none">None recorded.</p>'}
+    <b>Amenities</b>${am?`<p class="ri-none" style="margin:0">Among ${am.comps} competitors with amenity data.</p><ul class="ms-list">${am.advantages.map(x=>`<li>Advantage: ${esc(x.amenity)} (${x.have} of ${x.of} competitors list it)</li>`).join("")}${am.disadvantages.map(x=>`<li>Gap: ${esc(x.amenity)} (${x.have} of ${x.of} competitors list it)</li>`).join("")}</ul>`:'<p class="ri-none">Needs our amenities and at least 2 competitors with amenity data.</p>'}
+    <form class="ms-form" data-ms-form="amen"><input name="amenities" value="${esc((p.amenities||[]).join(", "))}" placeholder="Our amenities, comma separated"><button class="btn" type="submit">Save our amenities</button></form></div></div>
+  </section>
+
+  <section class="ms-sec"><h4>Findings for the Word agenda</h4><p class="sub">Only actionable items. Untick anything you don't want in the agenda. These are for management review, not pricing recommendations.</p>
+    ${a.findings.length?`<ul class="ms-find">${a.findings.map(f=>`<li><label><input type="checkbox" data-ms-inc="${esc(fid(f))}" ${ex[fid(f)]?"":"checked"}> <span>${esc(f.text)}<small>${esc(f.source)}${f.date?" · "+esc(MS.fmtDate(f.date)):""}${f.url?` · <a href="${esc(f.url)}" target="_blank" rel="noopener">link</a>`:""}</small></span></label></li>`).join("")}</ul>`:'<p class="ri-none">Nothing actionable.</p>'}
+  </section>
+
+  <section class="ms-sec"><h4>${msEdit&&msEdit.pid===p.id?"Correct an entry":"Add a survey entry"}</h4><p class="sub">An entry is saved to the survey for its verified date. Saving the same competitor and floor plan for the same date replaces that entry. Earlier surveys are kept for history.</p>
+    <form class="ms-entry" data-ms-form="entry">
+      <label>Property<select name="compId" required><option value="">Choose…</option>${opts.map(([id,l])=>`<option value="${esc(id)}" ${e.compId===id?"selected":""}>${esc(l)}</option>`).join("")}</select></label>
+      <label>Bedrooms (0 = studio)<input name="beds" type="number" min="0" max="6" step="1" value="${v(e.beds)}" required></label>
+      <label>Bathrooms<input name="baths" type="number" min="0.5" step="0.5" value="${v(e.baths)}"></label>
+      <label>Square feet<input name="sqft" type="number" min="1" value="${v(e.sqft)}"></label>
+      <label>Plan name<input name="plan" value="${v(e.plan)}"></label>
+      <label>Advertised rent ($)<input name="askingRent" type="number" min="1" step="1" value="${v(e.askingRent)}" placeholder="Blank if not published"></label>
+      <label>Concession<select name="concessionType"><option value="">None</option>${Object.entries(MS.CONCESSION_TYPES).map(([k,l])=>`<option value="${k}" ${e.concession?.type===k?"selected":""}>${esc(l)}</option>`).join("")}</select></label>
+      <label>Concession amount<input name="concessionValue" type="number" min="0" step="any" value="${v(e.concession?.value)}"></label>
+      <label>Lease term (months)<input name="termMonths" type="number" min="1" step="1" value="${v(e.concession?.termMonths)}"></label>
+      <label class="wide">Concession wording<input name="concessionText" value="${v(e.concession?.text)}" placeholder="As advertised"></label>
+      <label>Available units<input name="availableUnits" type="number" min="0" step="1" value="${v(e.availableUnits)}"></label>
+      <label>Move-in dates<input name="moveIn" value="${v(e.moveIn)}"></label>
+      <label class="wide">Amenities<input name="amenities" value="${esc((e.amenities||[]).join(", "))}" placeholder="Comma separated"></label>
+      <label>Utilities included<input name="utilities" value="${esc((e.utilities||[]).join(", "))}"></label>
+      <label>Parking<input name="parking" value="${v(e.parking)}"></label><label>Pets<input name="pets" value="${v(e.pets)}"></label>
+      <label class="wide">Source URL<input name="url" value="${v(e.url)}" placeholder="https://"></label>
+      <label>Source description<input name="sourceLabel" value="${v(e.sourceLabel)}" placeholder="e.g. Property website"></label>
+      <label>Last verified<input name="verifiedAt" type="date" value="${v(e.verifiedAt)}" max="${D.today}" required></label>
+      <label>Confidence<select name="confidence">${MS.CONFIDENCE.map(c=>`<option ${e.confidence===c?"selected":""}>${c}</option>`).join("")}</select></label>
+      <div class="ms-actions"><button class="btn primary" type="submit">Save entry</button>${msEdit&&msEdit.pid===p.id?'<button class="btn" type="button" data-ms="cancel">Cancel</button>':""}</div>
+    </form>
+    <div class="ms-upload"><b>Upload a survey file (CSV)</b><p class="sub" style="margin:0">One row per competitor floor plan. Use "Our property" as the competitor for our own rents. New competitor names are added to the competitor list but not approved. The same file can't be imported twice.</p>
+      <div class="row"><input type="file" accept=".csv,text/csv" data-ms-file aria-label="Survey CSV file"><button class="btn" type="button" data-ms="template">Download template</button><button class="btn" type="button" data-ms="export">Download this survey (CSV)</button></div>
+      ${msImport&&msImport.pid===p.id?`<div class="ms-preview"><p><b>${esc(msImport.file)}</b>: ${msImport.rows.length} row(s) ready${msImport.newCompetitors.length?`, ${msImport.newCompetitors.length} new competitor(s): ${esc(msImport.newCompetitors.map(c=>c.name).join(", "))}`:""}.</p>${msImport.errors.length?`<ul class="ms-list">${msImport.errors.slice(0,12).map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}<div class="row">${msImport.rows.length?'<button class="btn primary" type="button" data-ms="import">Import</button>':""}<button class="btn" type="button" data-ms="cancelimport">Cancel</button></div></div>`:""}
+    </div>
+  </section>
+
+  <section class="ms-sec"><h4>Survey history</h4>${a.dates.length?`<ul class="ms-list">${a.dates.map(d=>{const rs=a.rows.filter(r=>r.verifiedAt===d&&(r.compId==="subject"||set.approved.includes(r.compId)));return `<li>${esc(MS.fmtDate(d))}: ${rs.length} figure(s) from ${new Set(rs.map(r=>r.compId)).size} propert${new Set(rs.map(r=>r.compId)).size===1?"y":"ies"} · ${esc([...new Set(rs.map(r=>r.sourceLabel||"Survey"))].join(", "))}</li>`}).join("")}</ul>`:'<p class="ri-none">No surveys yet.</p>'}</section>`;
+}
+const msCsvCell=x=>{const s=x==null?"":String(x);return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+async function msSaveFile(name,text){
+  const blob=new Blob([text],{type:"text/csv"}),dl=await msDl;
+  if(dl){try{await dl.save({filename:name,data:blob})}catch(e){if(e.code!=="declined")toast("Couldn't save the file.")}return}
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.append(a);a.click();a.remove();
+}
+async function msUpsertRows(D,p,rows,importKey,label){
+  const byDate={};rows.forEach(r=>{(byDate[r.verifiedAt]??=[]).push(r)});
+  for(const [date,rs] of Object.entries(byDate)){
+    const id=p.id+"__"+date,cur=D.surveys.find(s=>s.id===id)||{rows:[],imports:[]};
+    const map=new Map((cur.rows||[]).map(r=>[MS.rowKey(r),r]));rs.forEach(r=>map.set(MS.rowKey(r),{...r,distance:undefined}));
+    const ok=await msWrite("surveys",id,{propertyId:p.id,date,source:{label:label||cur.source?.label||"Manual entry"},rows:[...map.values()].map(r=>JSON.parse(JSON.stringify(r))),imports:[...(cur.imports||[]),...(importKey?[importKey]:[])],updatedAt:new Date().toISOString()});
+    if(!ok)return false;
+  }
+  return true;
+}
+$("#msPanel").addEventListener("click",async e=>{
+  const b=e.target.closest("[data-ms]");if(!b)return;
+  const D=msData(),act=b.dataset.ms,p=msProp(D,msPref.open);
+  if(act==="open"){msPref.open=b.dataset.id;msEdit=null;msImport=null;msMsg="";msCandOpen=false;msSavePref();renderMarket();$("#msPanel").scrollIntoView({block:"start"});return}
+  if(act==="back"){msPref.open="";msEdit=null;msImport=null;msMsg="";msSavePref();renderMarket();return}
+  if(!p)return;
+  const set=msSet(D,p),id=b.dataset.id;
+  if(act==="approve"||act==="reject")msCandOpen=true;
+  if(act==="approve"){set.approved=[...new Set([...set.approved,id])];set.rejected=set.rejected.filter(x=>x!==id);await msSaveSet(D,p,set)}
+  else if(act==="reject"||act==="remove"){set.approved=set.approved.filter(x=>x!==id);set.rejected=[...new Set([...set.rejected,id])];await msSaveSet(D,p,set)}
+  else if(act==="restore"){set.rejected=set.rejected.filter(x=>x!==id);await msSaveSet(D,p,set)}
+  else if(act==="edit"){const an=MS.analyzeProperty({property:p,registry:D.registry,compSet:D.sets[p.id]||null,surveys:D.surveys,today:D.today,settings:msSettings()});const r=an.latest[+b.dataset.i];
+    msEdit={pid:p.id,row:{...r,verifiedAt:r.verifiedAt}};renderMarket();document.querySelector("[data-ms-form=entry]")?.scrollIntoView({block:"center"});return}
+  else if(act==="cancel"){msEdit=null}
+  else if(act==="cancelimport"){msImport=null}
+  else if(act==="template"){await msSaveFile("market-survey-template.csv",MS.CSV_COLUMNS.join(",")+"\n");return}
+  else if(act==="export"){const an=MS.analyzeProperty({property:p,registry:D.registry,compSet:D.sets[p.id]||null,surveys:D.surveys,today:D.today,settings:msSettings()});
+    const lines=an.latest.map(r=>{const c=D.registry.find(x=>x.id===r.compId)||{};return [r.compId==="subject"?"Our property":r.name,c.address||"",r.beds,r.baths,r.sqft,r.plan,r.askingRent,r.concession?.type,r.concession?.value,r.concession?.termMonths,r.concession?.text,r.availableUnits,r.moveIn,(r.amenities||[]).join("; "),(r.utilities||[]).join("; "),r.parking,r.pets,set.distances?.[r.compId],r.url,r.verifiedAt,r.confidence].map(msCsvCell).join(",")});
+    await msSaveFile(p.name.replace(/[^\w ]+/g,"")+" market survey "+D.today+".csv",MS.CSV_COLUMNS.join(",")+"\n"+lines.join("\n")+"\n");return}
+  else if(act==="import"&&msImport){
+    if(D.surveys.some(s=>s.propertyId===p.id&&(s.imports||[]).includes(msImport.key))){msMsg="This file was already imported for "+p.name+". Nothing was added.";msImport=null;renderMarket();return}
+    for(const c of msImport.newCompetitors){if(!MS.findDuplicate(D.registry,c))await msWrite("comps",c.id,{name:c.name,address:c.address||"",sourceUrl:"",submarket:p.submarket||"",rents:{},history:{},addedAt:new Date().toISOString(),manual:true})}
+    const dists=Object.fromEntries(msImport.rows.filter(r=>r.distance!=null&&r.compId!=="subject").map(r=>[r.compId,r.distance]));
+    if(Object.keys(dists).length){set.distances={...(set.distances||{}),...dists};await msSaveSet(D,p,set)}
+    const ok=await msUpsertRows(D,p,msImport.rows,msImport.key,"Uploaded survey: "+msImport.file);
+    const notApproved=[...new Set(msImport.rows.filter(r=>r.compId!=="subject"&&!set.approved.includes(r.compId)).map(r=>r.compId))];
+    msMsg=ok?`Imported ${msImport.rows.length} row(s) from ${msImport.file}.`+(notApproved.length?` ${notApproved.length} competitor(s) in the file aren't approved for ${p.name} yet, so their rents aren't compared until you approve them.`:""):"Import failed.";
+    msImport=null;
+  }
+  renderMarket();
+});
+$("#msPanel").addEventListener("toggle",e=>{if(e.target.matches?.("[data-ms-cands]"))msCandOpen=e.target.open},true);
+$("#msPanel").addEventListener("change",async e=>{
+  const t=e.target,D=msData(),p=msProp(D,msPref.open);
+  if(t.id==="msSource"){msPref.source=t.value;msPref.open="";msEdit=null;msImport=null;msMsg="";msSavePref();renderMarket();return}
+  if(t.id==="msStale"||t.id==="msMat"||t.id==="msChg"){const k={msStale:"staleDays",msMat:"materialityPct",msChg:"rentChangeMin"}[t.id],n=parseFloat(t.value);if(isFinite(n)&&n>0)msPref[k]=n;msSavePref();renderMarket();return}
+  if(t.id==="msInAgenda"){msPref.inAgenda=t.checked;msSavePref();return}
+  if(t.dataset.msInc){if(t.checked)delete msPref.excluded[t.dataset.msInc];else msPref.excluded[t.dataset.msInc]=true;msSavePref();return}
+  if(!p)return;
+  if(t.matches("[data-ms-office]")){let o=t.value;if(o==="__new"){o=(prompt("Name of the new office")||"").trim();if(!o){renderMarket();return}}
+    if(await msWrite("properties",p.id,{office:o},true))toast(p.name+" moved to "+o);return}
+  if(t.dataset.msDist){const set=msSet(D,p),n=parseFloat(t.value);set.distances={...(set.distances||{})};if(isFinite(n)&&n>=0)set.distances[t.dataset.msDist]=n;else delete set.distances[t.dataset.msDist];await msSaveSet(D,p,set);return}
+  if(t.matches("[data-ms-file]")&&t.files[0]){const f=t.files[0];const text=await f.text();const parsed=MS.parseCsv(text);
+    if(parsed.errors.length){msImport=null;msMsg=parsed.errors.join(" ");renderMarket();return}
+    const res=MS.importRecords(parsed.records,{registry:D.registry,subject:p,today:D.today});
+    msImport={pid:p.id,file:f.name,key:parsed.key,...res};msMsg="";renderMarket();}
+});
+$("#msPanel").addEventListener("submit",async e=>{
+  const f=e.target.closest("[data-ms-form]");if(!f)return;e.preventDefault();
+  const D=msData(),p=msProp(D,msPref.open);if(!p)return;const fd=Object.fromEntries(new FormData(f).entries());
+  if(f.dataset.msForm==="comp"){
+    const cand={name:fd.name.trim(),address:fd.address.trim(),url:fd.url.trim()};if(!cand.name)return;
+    if(cand.url&&!/^https?:\/\//i.test(cand.url)){msMsg="The URL must start with http:// or https://.";renderMarket();return}
+    const set=msSet(D,p),dup=MS.findDuplicate(D.registry,cand);let id;
+    if(dup){id=dup.id;msMsg=`${dup.name} is already on the competitor list${set.approved.includes(id)?" and approved for "+p.name:""}, so no duplicate was added.`}
+    else{id=MS.newCompId(D.registry,cand.name);if(!await msWrite("comps",id,{name:cand.name,address:cand.address,sourceUrl:cand.url,submarket:p.submarket||"",rents:{},history:{},addedAt:new Date().toISOString(),manual:true}))return;msMsg=`Added ${cand.name} and approved it for ${p.name}.`}
+    const s2=msSet(msData(),p);s2.approved=[...new Set([...s2.approved,id])];s2.rejected=s2.rejected.filter(x=>x!==id);const d=parseFloat(fd.distance);if(isFinite(d)&&d>=0)s2.distances={...(s2.distances||{}),[id]:d};
+    await msSaveSet(msData(),p,s2);renderMarket();return;
+  }
+  if(f.dataset.msForm==="amen"){await msWrite("properties",p.id,{amenities:fd.amenities.split(",").map(s=>s.trim()).filter(Boolean)},true);msMsg="Saved our amenities.";renderMarket();return}
+  if(f.dataset.msForm==="entry"){
+    const {row,errors}=MS.cleanRow(fd,D.today);
+    if(errors.length){msMsg="Not saved: "+errors.join("; ")+".";renderMarket();return}
+    if(msEdit&&msEdit.row&&msEdit.pid===p.id&&msEdit.row.verifiedAt===row.verifiedAt&&MS.rowKey(msEdit.row)!==MS.rowKey(row)){
+      // a correction that changed the floor plan replaces the original entry for that date
+      const id=p.id+"__"+row.verifiedAt,cur=D.surveys.find(s=>s.id===id);if(cur)cur.rows=(cur.rows||[]).filter(r=>MS.rowKey(r)!==MS.rowKey(msEdit.row));
+    }
+    if(await msUpsertRows(D,p,[row],null,"Manual entry")){msMsg=`Saved ${row.compId==="subject"?p.name:(D.registry.find(c=>c.id===row.compId)||{}).name} ${MS.bedLabel(row.beds).toLowerCase()} for ${MS.fmtDate(row.verifiedAt)}.`+(row.compId!=="subject"&&!msSet(msData(),p).approved.includes(row.compId)?" This competitor isn't approved for this property, so it isn't compared yet.":"");msEdit=null}
+    renderMarket();
+  }
+});
+// the Call agenda tab's Word build asks for this; only included findings, grouped office → property
+window.__marketAgenda=()=>{
+  if(!msPref.inAgenda)return null;const D=msData();if(!D.props.length)return null;
+  const groups=MS.agendaGroups(msAnalyses(D),msPref.excluded);if(!groups.length)return null;
+  return {marketSummary:groups,marketSummaryNote:`Competitor surveys as of ${MS.fmtDate(D.today)}. Each property is compared only with its own approved competitors. For management review, not pricing recommendations. Full surveys are on the Region tab of the Command Deck.`+(D.sample?" FICTIONAL SAMPLE DATA: delete this section before sending.":"")};
 };
 
 $("#scoreFilter").addEventListener("click",e=>{const b=e.target.closest("[data-s]");if(b){scoreSub=b.dataset.s;renderScorecard()}});
@@ -1927,6 +2618,8 @@ function renderMtChart(){
   load(rgDb.collection("comps"),"comps",s=>{rgComps=toList(s);renderRegion()});
   load(rgDb.collection("reports").orderBy("loadedAt","desc").limit(36),"report history",s=>{rgReports=toList(s);renderRegion()});
   load(rgDb.doc("meta/survey"),"survey date",s=>{rgMeta=s.exists?s.data():null;renderRegion()});
+  load(rgDb.collection("compSets"),"competitive sets",s=>{msCompSets=Object.fromEntries(toList(s).map(x=>[x.id,x]));renderRegion()});
+  load(rgDb.collection("surveys"),"market surveys",s=>{msSurveys=toList(s);renderRegion()});
   setTimeout(()=>{if(!rgProps.length&&!$("#scoreTbl").textContent.includes("Couldn't"))$("#scoreTbl").innerHTML=`<tbody><tr><td class="empty-state">Still waiting on your data after 15 seconds. Reload the page. If this keeps happening, tell Claude this message.</td></tr></tbody>`},15000);
 })();
 try{matchMedia("(prefers-color-scheme: light)").addEventListener("change",()=>{subChart?.destroy();subChart=null;renderSubChart()})}catch(e){}
@@ -2396,6 +3089,26 @@ PROJECTS.flatMap(g=>g.items).forEach(it=>COMMANDS.push({t:it.name,h:"Project",ru
     return x;
   }
 
+  /* market survey summary: [{office, properties:[{property, lastSurvey, points:[{text, source, date, url}]}]}] */
+  function marketSummaryXml(groups, note) {
+    const run = (t, o) => `<w:r>${RPR(o)}<w:t xml:space="preserve">${xe(t)}</w:t></w:r>`;
+    const para = (runs, o = {}) => `<w:p><w:pPr>${o.pageBreak ? '<w:pageBreakBefore/>' : ''}${o.keep ? '<w:keepNext/>' : ''}<w:spacing w:before="${o.before || 0}" w:after="${o.after ?? 60}"/>${o.ind ? `<w:ind w:left="${o.ind}" w:hanging="${o.hang || 0}"/>` : ''}</w:pPr>${runs}</w:p>`;
+    let x = para(run('Market survey summary', { b: true, color: '00225B', sz: 26 }), { pageBreak: true, keep: true, after: 80 });
+    if (note) x += para(run(note, { i: true, color: '595959', sz: 16 }), { after: 160 });
+    for (const o of groups) {
+      x += para(run(o.office, { b: true, color: '00225B', sz: 22 }), { keep: true, before: 160, after: 60 });
+      if (o.missing && o.missing.length) x += para(run('No competitor survey on file yet: ' + o.missing.join(', ') + '.', { i: true, sz: 17 }), { ind: 180, after: 60 });
+      for (const p of o.properties) {
+        x += para(run(p.property, { b: true, sz: 19 }), { keep: true, before: 60, after: 40, ind: 180 });
+        for (const pt of p.points) {
+          x += para(run('•  ', { sz: 18 }) + run(pt.text, { sz: 18 }), { keep: true, ind: 400, hang: 220, after: 10 });
+          x += para(run('Source: ' + pt.source + ' · ' + pt.date + (pt.url ? ' · ' + pt.url : ''), { i: true, color: '595959', sz: 15 }), { ind: 400, after: 70 });
+        }
+      }
+    }
+    return x;
+  }
+
   /* input: {settings, reports:{KIND:result}, checks, slots:{BOXID:{status:'shot'|'noaccess'|'skip', images:[{w,h,bytes}]}}, builtAt, talkingPoints?, talkingPointsNote?} */
   async function buildDocx(templateData, input) {
     const zip = await JSZipLib.loadAsync(templateData);
@@ -2458,7 +3171,8 @@ PROJECTS.flatMap(g=>g.items).forEach(it=>COMMANDS.push({t:it.name,h:"Project",ru
         doc = doc.split(marker).join(xe(msg));
       }
     }
-    if (input.talkingPoints && input.talkingPoints.length) { const at = doc.lastIndexOf('<w:sectPr'); if (at > 0) doc = doc.slice(0, at) + talkingPointsXml(input.talkingPoints, input.talkingPointsNote) + doc.slice(at); }
+    const extra = (input.talkingPoints && input.talkingPoints.length ? talkingPointsXml(input.talkingPoints, input.talkingPointsNote) : '') + (input.marketSummary && input.marketSummary.length ? marketSummaryXml(input.marketSummary, input.marketSummaryNote) : '');
+    if (extra) { const at = doc.lastIndexOf('<w:sectPr'); if (at > 0) doc = doc.slice(0, at) + extra + doc.slice(at); }
     zip.file('word/document.xml', doc); if (hdr) zip.file('word/header1.xml', hdr);
     zip.file('word/_rels/document.xml.rels', rels);
     let ctXml = await zip.file('[Content_Types].xml').async('string');
@@ -2469,7 +3183,7 @@ PROJECTS.flatMap(g=>g.items).forEach(it=>COMMANDS.push({t:it.name,h:"Project",ru
     return zip.generateAsync({ type: typeof window === 'undefined' ? 'nodebuffer' : 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', compression: 'DEFLATE' });
   }
 
-  const api = { readXlsx, readReport, buildChecks, buildDocx, REPORTS, ORDER, tableXml, talkingPointsXml };
+  const api = { readXlsx, readReport, buildChecks, buildDocx, REPORTS, ORDER, tableXml, talkingPointsXml, marketSummaryXml };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.AgendaEngine = api;
 })(typeof window !== 'undefined' ? window : globalThis);
 
@@ -2791,7 +3505,7 @@ $('ca-build').addEventListener('click', async () => {
     const blob = await E.buildDocx(b64bytes(TEMPLATE_B64), {
       settings: { property: f.property, code: f.code, entity: f.entity, cm: f.cm, maint: f.maint, leasing: f.leasing, callLabel: callLabel(f), week: f.week },
       reports: state.reports, checks, slots, builtAt: fmtTime(Date.now()),
-      ...(window.__regionTalkingPoints?.() || {}) });
+      ...(window.__regionTalkingPoints?.() || {}), ...(window.__marketAgenda?.() || {}) });
     const name = (f.property || 'Property') + ' Call Agenda ' + (f.date || iso(new Date())) + ' DRAFT.docx';
     if (!downloads) { setMsg('Saving files is not available in this view. Open the page from claude.ai to download the agenda.', 'err'); return; }
     await downloads.save({ filename: name, data: blob });

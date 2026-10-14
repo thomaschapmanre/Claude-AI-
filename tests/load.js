@@ -16,6 +16,7 @@ function load(match) {
 module.exports = {
   html,
   insights: () => load('region-insights-engine'),
+  market: () => load('market-survey-engine'),
   agenda: () => load('Call Agenda engine'),
   templateBytes: () => Buffer.from(/const TEMPLATE_B64 = "([^"]+)"/.exec(html)[1], 'base64')
 };
