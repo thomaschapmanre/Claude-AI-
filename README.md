@@ -72,7 +72,7 @@ Every property has its own market survey: its own approved competitors, its own 
 
 ### How it is organised
 
-- **Offices.** Each property belongs to an office. Midtown is always its own office. Every other property starts as **Unassigned** until you pick its office on its survey page (choose **New office…** to create one). The app does not guess office assignments.
+- **Offices.** Each property belongs to an office. Midtown is always its own office. The other offices are Katie's Place, Sylvia's Place, Edgewater Apartments, Lily's Place and Park Lane Villas. Each office's address and phone are stored in `offices` and shown on its section. To move a property, pick its office on its survey page; choose **New office…** to create one. A property with no office is listed under **Unassigned**.
 - **Overview.** The panel opens with one line for the whole region, then one section per office. Each office section lists:
   - its properties and when each was last surveyed;
   - where each one's rent sits against its own competitors, for each bedroom count;

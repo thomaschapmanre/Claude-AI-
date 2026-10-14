@@ -346,6 +346,7 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13px;min-width:720px}
 .ri-card .row{display:flex;gap:8px;flex-wrap:wrap}
 .ri-none{font-size:13px;color:var(--faint);margin:0 0 8px}
 .ms-region{font-size:13px;line-height:1.5;padding:10px 12px;border-radius:9px;background:var(--surface-2);margin-bottom:10px}.ms-region small{display:block;color:var(--faint)}
+.ms-oinfo{display:block;font-size:12px;font-weight:400;color:var(--faint);margin-top:2px}
 .ms-office{border-top:1px solid var(--line);padding-top:12px;margin-top:12px}.ms-line{font-size:13px;color:var(--muted);margin:0 0 8px}
 .ms-tbl{min-width:640px}.ms-wide{min-width:1500px}.ms-tbl .tag{margin:1px 2px 1px 0}.ms-tbl tr.ms-note td{border-bottom:1px solid var(--line-2);padding-top:0}
 .ms-ph{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:6px}.ms-ph h3{margin:0;font-size:16px}
@@ -2173,7 +2174,7 @@ window.__regionTalkingPoints=()=>{
 const MS=window.MarketSurvey;
 const msPref=Object.assign({source:"saved",staleDays:30,materialityPct:5,rentChangeMin:25,open:"",excluded:{},inAgenda:true},store.get("cd.thomas.market",{}));
 const msSavePref=()=>store.set("cd.thomas.market",msPref);
-let msCompSets={},msSurveys=[],msSample=null,msImport=null,msEdit=null,msMsg="",msCandOpen=false;
+let msOffices={},msCompSets={},msSurveys=[],msSample=null,msImport=null,msEdit=null,msMsg="",msCandOpen=false;
 const msDl=(window.claude?.use?.("downloads")??Promise.resolve(null)).catch(()=>null);
 const msToday=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 function msData(){
@@ -2220,7 +2221,8 @@ function msOverview(sum,D,an){
     const ab=o.properties.filter(p=>p.above.length),be=o.properties.filter(p=>p.below.length),rf=o.properties.filter(p=>p.needsRefresh);
     const line=[ab.length?`Above range: ${ab.map(p=>p.name+" ("+p.above.join(", ")+")").join("; ")}.`:"",be.length?`Below range: ${be.map(p=>p.name+" ("+p.below.join(", ")+")").join("; ")}.`:"",
       o.newConcessions?`${o.newConcessions} new competitor concession${o.newConcessions>1?"s":""}.`:"",o.rentDrops?`${o.rentDrops} competitor rent cut${o.rentDrops>1?"s":""}.`:"",rf.length?`Survey needs refreshing: ${rf.map(p=>p.name).join(", ")}.`:""].filter(Boolean).join(" ")||"No pricing gaps or competitor changes flagged.";
-    return `<section class="ms-office"><div class="ri-ph"><h3>${esc(o.office)}${o.office===MS.MIDTOWN_OFFICE?' <span class="label">kept separate</span>':""}</h3><span class="label">${o.properties.length} propert${o.properties.length===1?"y":"ies"}</span></div>
+    const od=D.sample?null:msOffices[o.office];
+    return `<section class="ms-office"><div class="ri-ph"><h3>${esc(o.office)}${o.office===MS.MIDTOWN_OFFICE?' <span class="label">kept separate</span>':""}${od?`<small class="ms-oinfo">${esc([od.address,od.phone,od.manager&&"Manager: "+od.manager].filter(Boolean).join(" · "))}</small>`:""}</h3><span class="label">${o.properties.length} propert${o.properties.length===1?"y":"ies"}</span></div>
       <p class="ms-line">${esc(line)}</p>
       <div class="tbl-wrap"><table class="tbl ms-tbl"><thead><tr><th>Property</th><th class="num">Competitors</th><th>Last survey</th><th>Position by floor plan</th><th>Changes</th><th class="num">Findings</th><th></th></tr></thead><tbody>
       ${o.properties.map(p=>{const a=an.find(x=>x.property.id===p.id);return `<tr><td><b>${esc(p.name)}</b></td><td class="num">${p.competitors}</td>
@@ -2232,7 +2234,7 @@ function msOverview(sum,D,an){
 }
 function msPropertyPage(D,a){
   const p=a.property,set=a.compSet,reg=D.registry,name=id=>(reg.find(c=>c.id===id)||{}).name||id;
-  const offices=[...new Set([...D.props.map(x=>MS.officeOf(x)),MS.UNASSIGNED])].filter(o=>o!==MS.MIDTOWN_OFFICE).sort();
+  const offices=[...new Set([...D.props.map(x=>MS.officeOf(x)),...(D.sample?[]:Object.keys(msOffices)),MS.UNASSIGNED])].filter(o=>o!==MS.MIDTOWN_OFFICE).sort();
   const cands=MS.candidates(p,reg,set),fid=f=>MS.findingId(f);
   const latest=a.latest,ex=msPref.excluded;
   const rowsHtml=latest.map((r,i)=>{const c=reg.find(x=>x.id===r.compId)||{},dist=r.compId==="subject"?"":set.distances?.[r.compId];
@@ -2618,6 +2620,7 @@ function renderMtChart(){
   load(rgDb.collection("comps"),"comps",s=>{rgComps=toList(s);renderRegion()});
   load(rgDb.collection("reports").orderBy("loadedAt","desc").limit(36),"report history",s=>{rgReports=toList(s);renderRegion()});
   load(rgDb.doc("meta/survey"),"survey date",s=>{rgMeta=s.exists?s.data():null;renderRegion()});
+  load(rgDb.collection("offices"),"offices",s=>{msOffices=Object.fromEntries(toList(s).map(x=>[x.name,x]));renderRegion()});
   load(rgDb.collection("compSets"),"competitive sets",s=>{msCompSets=Object.fromEntries(toList(s).map(x=>[x.id,x]));renderRegion()});
   load(rgDb.collection("surveys"),"market surveys",s=>{msSurveys=toList(s);renderRegion()});
   setTimeout(()=>{if(!rgProps.length&&!$("#scoreTbl").textContent.includes("Couldn't"))$("#scoreTbl").innerHTML=`<tbody><tr><td class="empty-state">Still waiting on your data after 15 seconds. Reload the page. If this keeps happening, tell Claude this message.</td></tr></tbody>`},15000);
