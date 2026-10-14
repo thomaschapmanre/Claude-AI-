@@ -1,0 +1,11 @@
+{
+  "name": "young-development-tools",
+  "private": true,
+  "description": "Command Deck, Delq Packets and related Young Development tools (single-file HTML pages).",
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  },
+  "devDependencies": {
+    "jszip": "3.10.1"
+  }
+}
