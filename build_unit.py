@@ -117,6 +117,8 @@ QUADS = [(0, 1, 2, 3), (4, 7, 6, 5), (0, 4, 5, 1), (1, 5, 6, 2), (2, 6, 7, 3), (
 
 def box(mat, x0, x1, y0, y1, z0, z1, collide=False):
     x0, x1 = sorted((x0, x1)); y0, y1 = sorted((y0, y1)); z0, z1 = sorted((z0, z1))
+    e = random.uniform(0, 0.004)   # break coplanar overlaps (Cycles renders them as black seams)
+    x0, x1, y0, y1, z0, z1 = x0 - e, x1 + e, y0 - e, y1 + e, z0 - e, z1 + e
     v = [(x0, y0, z0), (x1, y0, z0), (x1, y0, z1), (x0, y0, z1), (x0, y1, z0), (x1, y1, z0), (x1, y1, z1), (x0, y1, z1)]
     add(mat, v, QUADS)
     if collide and y0 < 4 and y1 > 0.5:
@@ -145,13 +147,13 @@ def cyl(mat, x, z, y0, y1, r, seg=16, ry=None):
         f += [(2 * i, len(v) - 2, 2 * j), (2 * i + 1, 2 * j + 1, len(v) - 1)]
     add(mat, v, f)
 
-def sphere(mat, x, y, z, r, sy=1.0, seg=12, rings=8):
+def sphere(mat, x, y, z, r, sy=1.0, seg=12, rings=8, sz=1.0):
     v, f = [], []
     for j in range(rings + 1):
         t = math.pi * j / rings
         for i in range(seg):
             a = 2 * math.pi * i / seg
-            v.append((x + r * math.sin(t) * math.cos(a), y + r * sy * math.cos(t), z + r * math.sin(t) * math.sin(a)))
+            v.append((x + r * math.sin(t) * math.cos(a), y + r * sy * math.cos(t), z + r * sz * math.sin(t) * math.sin(a)))
     for j in range(rings):
         for i in range(seg):
             a, b = j * seg + i, j * seg + (i + 1) % seg
@@ -277,9 +279,9 @@ def shaker(x0, x1, y0, y1, z0, z1, face, doors=1):
 def toilet(x, z, face):
     """face: direction the bowl points ('s','w')."""
     dx, dz = {"s": (0, 1), "w": (-1, 0), "e": (1, 0), "n": (0, -1)}[face]
-    tx, tz = x - dx * 0.0, z - dz * 0.0
-    if dx: box("porcelain", tx, tx - dx * 0.75, 1.3, 2.7, z - 0.9, z + 0.9, collide=True)
-    else:  box("porcelain", x - 0.9, x + 0.9, 1.3, 2.7, tz, tz - dz * 0.75, collide=True)
+    tx, tz = x, z   # wall face behind the tank
+    if dx: box("porcelain", tx, tx + dx * 0.75, 1.3, 2.7, z - 0.9, z + 0.9, collide=True)
+    else:  box("porcelain", x - 0.9, x + 0.9, 1.3, 2.7, tz, tz + dz * 0.75, collide=True)
     bx, bz = x + dx * 1.2, z + dz * 1.2
     cyl("porcelain", bx, bz, 0, 1.25, 0.6)
     COLL.append([bx - 0.6, bx + 0.6, bz - 0.6, bz + 0.6])
@@ -304,7 +306,7 @@ def vanity_east(xw, z0, z1, ylight=7.0):
 def build():
     S = T / 2
     # floors (LVP in living/kitchen/baths/hall/laundry, carpet in bedrooms+closets)
-    for r in [(0, 12.6, 0, 25.8), (0, 13.2, 25.8, 39.5), (0, 4, 39.5, 44), (4, 8, 39.5, 44), (12.6, 19.3, 21.4, 25.8),
+    for r in [(0, 12.6, 0, 25.8), (0, 13.2, 25.8, 39.5), (0, 4, 39.5, 46.5), (4, 8, 39.5, 46.5), (12.6, 19.3, 21.4, 25.8),
               (12.6, 15.1, 0, 6.6), (10.4, 15.1, -4.4, 0), (21.4, 28.4, 6.6, 10.9), (17.9, 28.4, 10.9, 15.3),
               (19.3, 28.4, 15.3, 25.8), (12.6, 19.3, 17.4, 21.4)]:
         floor("lvp", *r)
@@ -314,7 +316,7 @@ def build():
     floor("deck", 0, 10.4, -5.4, 0)
     box("grass", -200, 200, -11, -10.9, -200, 200)                 # ground, one storey down
     # ceilings
-    box("ceiling", 0, 28.4, H, H + 0.2, 0, 44); box("ceiling", 10.4, 28.4, H, H + 0.2, -4.4, 0)
+    box("ceiling", 0, 28.4, H, H + 0.2, 0, 46.5); box("ceiling", 10.4, 28.4, H, H + 0.2, -4.4, 0)
     box("deck", 0, 10.4, H, H + 0.2, -5.4, 0)
     for x in range(1, 11, 2):
         box("deck", x, x + 0.15, H - 0.7, H, -5.4, 0)                # exposed joists
@@ -326,9 +328,9 @@ def build():
     wall(15.1, -4.4, 15.1, 6.6, [(2.2, 5.0, 0, DH)])                 # primary bedroom door (from nook)
     wall(15.1, -4.4, 28.4, -4.4, [(17.0, 20.5, 2.5, 7.0), (23.0, 26.5, 2.5, 7.0)])
     wall(28.4, -4.4, 28.4, 41, [(7.8, 9.8, 3.5, 6.8), (15.8, 17.6, 3.5, 6.8), (29.0, 32.0, 2.5, 7.0)])
-    wall(0, 0, 0, 44)
-    wall(0, 44, 8, 44, [(0.6, 3.6, 0, DH)])                          # front door
-    wall(8, 39.5, 8, 44); wall(4, 39.5, 4, 44, [(40.2, 43.2, 0, DH)])   # laundry
+    wall(0, 0, 0, 46.5)
+    wall(0, 46.5, 8, 46.5, [(0.6, 3.6, 0, DH)])                          # front door
+    wall(8, 39.5, 8, 46.5); wall(4, 39.5, 4, 46.5, [(40.2, 42.8, 0, DH)])   # laundry closet, door off the entry
     wall(4, 39.5, 13.2, 39.5)                                         # kitchen back
     wall(13.2, 25.8, 13.2, 41)                                        # kitchen | bedroom 2
     wall(13.2, 41, 22, 41); wall(22, 35.8, 22, 41)                   # bedroom 2 closet
@@ -369,8 +371,8 @@ def build():
     door(13.8, 25.8, 90, 2.8)                      # bedroom 2
     door(24.6, 25.8, 90, 2.6)                      # bath 2 (from bedroom 2)
     door(16.5, 35.8, 270, 2.5)                     # bedroom 2 closet
-    door(4.0, 43.2, 180, 3.0)                      # laundry
-    door(0.6, 44.0, 270, 3.0)                      # front door
+    door(4.0, 42.8, 180, 2.6)                      # laundry
+    door(0.6, 46.5, 270, 3.0)                      # front door
     door(10.4, -1.0, 180, 2.6)                     # mech (out to balcony)
 
     # balcony railing + posts
@@ -443,11 +445,13 @@ def build():
     wire_shelf(13.2 + S, 14.4, 35.8 + S, 39.8)
     for y in (1.5, 3.0, 4.5, 6.0):
         wire_shelf(17.8, 19.3 - S, 17.4 + S, 21.4 - S, y, rod=False)   # linen
-    # laundry: stacked washer/dryer + shelf
-    box("white", 5.0, 7.5, 0, 6.2, 41.6, 44 - S, collide=True)
-    for y in (1.6, 4.7):
-        sphere("black", 6.25, y, 41.6, 0.7, sy=1.0)
-    wire_shelf(4 + S, 8 - S, 42.9, 44 - S, 6.8, rod=False)
+    # laundry: stacked front-load washer/dryer at the back (south) of the closet, facing north
+    for (y0, y1) in [(0.05, 2.95), (3.0, 5.9)]:
+        box("white", 4.6, 7.4, y0, y1, 43.9, 46.5 - S - 0.05, collide=True)
+        box("white", 4.65, 7.35, y1 - 0.45, y1 - 0.05, 43.85, 43.9)              # control panel
+        sphere("steel", 6.0, (y0 + y1) / 2 - 0.2, 43.9, 0.85, sz=0.06)          # door ring
+        sphere("black", 6.0, (y0 + y1) / 2 - 0.2, 43.88, 0.65, sz=0.06)         # door glass
+    wire_shelf(4 + S, 8 - S, 45.4, 46.5 - S, 6.6, rod=False)
     # mech closet: water heater + air handler
     cyl("white", 11.4, -3.4, 0, 5.0, 0.9); COLL.append([10.5, 12.3, -4.3, -2.5])
     box("steel", 13.0, 15.1 - S, 0, 6.5, -4.4 + S, -2.0, collide=True)
@@ -455,7 +459,7 @@ def build():
     # lighting
     fan(6.3, 11.0); fan(20.8, 30.8)
     for p in [(21.75, 1.1), (13.85, 3.3), (16.0, 8.8), (15.0, 13.0), (24.9, 8.8), (24.0, 13.0), (23.8, 20.5),
-              (16.0, 23.6), (2.0, 41.5), (6.0, 41.5), (17.6, 38.4), (15.9, 19.4), (12.7, -2.2), (5.2, -2.7)]:
+              (16.0, 23.6), (2.0, 43.5), (6.0, 42.0), (17.6, 38.4), (15.9, 19.4), (12.7, -2.2), (5.2, -2.7)]:
         dome(*p)
     for p in [(6.3, 3.5), (6.3, 19.0), (2.0, 33.0), (8.5, 34.0), (11.5, 34.0)]:
         can(*p)
@@ -531,7 +535,7 @@ def render(name, eye, target, ortho=False, hide_ceiling=False):
     bpy.ops.render.render(write_still=True)
 
 def self_check():
-    area = sum((r[1] - r[0]) * (r[3] - r[2]) for r in [(0, 12.6, 0, 25.8), (0, 13.2, 25.8, 39.5), (0, 8, 39.5, 44), (12.6, 19.3, 17.4, 25.8),
+    area = sum((r[1] - r[0]) * (r[3] - r[2]) for r in [(0, 12.6, 0, 25.8), (0, 13.2, 25.8, 39.5), (0, 8, 39.5, 46.5), (12.6, 19.3, 17.4, 25.8),
            (12.6, 15.1, 0, 6.6), (10.4, 15.1, -4.4, 0), (21.4, 28.4, 6.6, 10.9), (17.9, 28.4, 10.9, 15.3), (19.3, 28.4, 15.3, 25.8),
            (15.1, 28.4, -4.4, 6.6), (12.6, 21.4, 6.6, 10.9), (12.6, 17.9, 10.9, 15.3), (12.6, 19.3, 15.3, 17.4), (13.2, 28.4, 25.8, 35.8), (13.2, 22, 35.8, 41)])
     print(f"gross floor area (centerlines): {area:.0f} sq ft")
@@ -539,7 +543,7 @@ def self_check():
     assert all(c[0] < c[1] and c[2] < c[3] for c in COLL)
     # spawn point and every doorway centre must be walkable (no collider within player radius 0.6 ft)
     free = lambda x, z: not any(c[0] - 0.6 < x < c[1] + 0.6 and c[2] - 0.6 < z < c[3] + 0.6 for c in COLL)
-    for p in [(6.3, 22), (16.5, 6.6), (12.6, 3.3), (15.1, 3.6), (23.1, 6.6), (15.2, 25.8), (23.3, 25.8), (15.2, 35.8), (2.1, 44), (4, 41.7), (7.0, -2)]:
+    for p in [(6.3, 22), (16.5, 6.6), (12.6, 3.3), (15.1, 3.6), (23.1, 6.6), (15.2, 25.8), (23.3, 25.8), (15.2, 35.8), (2.1, 46.5), (4, 41.5), (7.0, -2)]:
         assert free(*p), f"blocked doorway at {p}"
 
 if __name__ == "__main__":
