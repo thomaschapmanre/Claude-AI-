@@ -507,7 +507,7 @@ def scene():
     sun.data.energy = 3; sun.rotation_euler = (math.radians(50), 0, math.radians(200))
     bpy.context.scene.collection.objects.link(sun)
     for i, p in enumerate(LIGHTS):
-        L = bpy.data.lights.new(f"lamp{i}", "POINT"); L.energy = 120; L.shadow_soft_size = 0.2
+        L = bpy.data.lights.new(f"lamp{i}", "POINT"); L.energy = 35; L.shadow_soft_size = 0.2
         o = bpy.data.objects.new(f"lamp{i}", L); o.location = to_bl(p)
         bpy.context.scene.collection.objects.link(o)
 
@@ -526,7 +526,7 @@ def render(name, eye, target, ortho=False, hide_ceiling=False):
             bpy.data.objects[n].hide_render = hide_ceiling
     sc.render.engine = "CYCLES"; sc.cycles.samples = 48; sc.cycles.use_denoising = True
     sc.render.resolution_x, sc.render.resolution_y = 1280, 720
-    sc.view_settings.view_transform = "AgX"
+    sc.view_settings.view_transform = "AgX"; sc.view_settings.exposure = -0.5
     sc.render.filepath = os.path.join(OUT, f"render_{name}.png")
     bpy.ops.render.render(write_still=True)
 
