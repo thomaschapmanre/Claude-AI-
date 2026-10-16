@@ -95,6 +95,13 @@ MATS = {
     "deck":      ((1, 1, 1), 0.7, 0, tex_deck, 3.6, 1, 0),
     "siding":    ((1, 1, 1), 0.8, 0, tex_siding, 3.0, 1, 0),
     "grass":     ((0.30, 0.42, 0.20), 1.0, 0, None, 0, 1, 0),
+    "fabric":    ((1, 1, 1), 0.95, 0, lambda: tex_noise((0.50, 0.51, 0.52), 0.04), 1.5, 1, 0),
+    "pillow":    ((0.33, 0.52, 0.64), 0.9, 0, None, 0, 1, 0),
+    "walnut":    ((0.28, 0.18, 0.12), 0.5, 0, None, 0, 1, 0),
+    "oak":       ((0.66, 0.50, 0.34), 0.5, 0, None, 0, 1, 0),
+    "linen":     ((0.93, 0.92, 0.89), 0.9, 0, None, 0, 1, 0),
+    "rug":       ((1, 1, 1), 1.0, 0, lambda: tex_noise((0.26, 0.27, 0.30), 0.12), 1.0, 1, 0),
+    "leaf":      ((0.17, 0.36, 0.16), 0.8, 0, None, 0, 1, 0),
 }
 
 # ---------------------------------------------------------------- geometry accumulator (feet, plan coords)
@@ -330,7 +337,7 @@ def build():
     wall(28.4, -4.4, 28.4, 41, [(7.8, 9.8, 3.5, 6.8), (15.8, 17.6, 3.5, 6.8), (29.0, 32.0, 2.5, 7.0)])
     wall(0, 0, 0, 46.5)
     wall(0, 46.5, 8, 46.5, [(0.6, 3.6, 0, DH)])                          # front door
-    wall(8, 39.5, 8, 46.5); wall(4, 39.5, 4, 46.5, [(40.2, 42.8, 0, DH)])   # laundry closet, door off the entry
+    wall(8, 39.5, 8, 46.5); wall(4, 39.5, 4, 46.5, [(40.2, 42.8, 0, DH)])   # coat closet off the entry
     wall(4, 39.5, 13.2, 39.5)                                         # kitchen back
     wall(13.2, 25.8, 13.2, 41)                                        # kitchen | bedroom 2
     wall(13.2, 41, 22, 41); wall(22, 35.8, 22, 41)                   # bedroom 2 closet
@@ -338,15 +345,15 @@ def build():
     wall(22, 41, 28.4, 41, base=False)
     # interior
     wall(12.6, 6.6, 28.4, 6.6, [(15.5, 17.5, 0, DH), (21.7, 24.4, 0, DH)])
-    wall(12.6, 6.6, 12.6, 21.4, [(18.0, 21.0, 0, DH)])               # accent wall w/ double linen doors
+    wall(12.6, 6.6, 12.6, 21.4)                                       # living-room accent wall
     wall(21.4, 6.6, 21.4, 10.9); wall(17.9, 10.9, 21.4, 10.9); wall(17.9, 10.9, 17.9, 15.3)
-    wall(17.9, 15.3, 28.4, 15.3); wall(12.6, 17.4, 19.3, 17.4); wall(12.6, 21.4, 19.3, 21.4)
-    wall(19.3, 15.3, 19.3, 25.8)
-    wall(12.6, 25.8, 28.4, 25.8, [(13.8, 16.6, 0, DH), (22.0, 24.6, 0, DH)])
+    wall(17.9, 15.3, 28.4, 15.3); wall(12.6, 17.4, 19.3, 17.4); wall(12.6, 21.4, 19.3, 21.4, [(13.6, 18.2, 0, DH)])   # laundry bifolds, across the hall from bedroom 2
+    wall(19.3, 15.3, 19.3, 25.8, [(22.4, 25.0, 0, DH)])            # bath 2 door at the end of the hall
+    wall(12.6, 25.8, 28.4, 25.8, [(13.8, 16.6, 0, DH)])
 
     # accent paint on living side of x=12.6 wall
     ax = 12.6 - S - 0.01
-    for (z0, z1, y0, y1) in [(6.6 + S, 18.0, 0.4, H), (21.0, 21.4 + S, 0.4, H), (18.0, 21.0, DH + 0.3, H)]:
+    for (z0, z1, y0, y1) in [(6.6 + S, 21.4 + S, 0.4, H)]:
         box("accent", ax - 0.01, ax, y0, y1, z0, z1)
     # siding on balcony faces
     for (x0, x1, y0) in [(0, 4.0, 0), (4.0, 10.1, DH + 0.2), (10.1, 10.4 - S, 0)]:   # skip the slider opening
@@ -367,11 +374,11 @@ def build():
     door(15.1, 5.0, 180, 2.8)                      # primary bed (swings into nook)
     door(15.5, 6.6, 270, 2.0)                      # walk-in closet
     door(24.4, 6.6, 270, 2.7)                      # primary bath
-    door(12.6, 18.0, 180, 1.5); door(12.6, 21.0, 180, 1.5)   # linen double doors
+    door(13.6, 21.4, 270, 1.15); door(18.2, 21.4, 270, 1.15)   # laundry bifolds, folded open
     door(13.8, 25.8, 90, 2.8)                      # bedroom 2
-    door(24.6, 25.8, 90, 2.6)                      # bath 2 (from bedroom 2)
+    door(19.3, 22.4, 0, 2.6)                       # bath 2 (from the hall)
     door(16.5, 35.8, 270, 2.5)                     # bedroom 2 closet
-    door(4.0, 42.8, 180, 2.6)                      # laundry
+    door(4.0, 42.8, 180, 2.6)                      # coat closet
     door(0.6, 46.5, 270, 3.0)                      # front door
     door(10.4, -1.0, 180, 2.6)                     # mech (out to balcony)
 
@@ -443,15 +450,14 @@ def build():
     wire_shelf(16.7, 17.9 - S, 10.9 + S, 15.3)                         # east run
     wire_shelf(13.2 + S, 22 - S, 39.8, 41 - S)                          # bedroom 2 closet, back wall
     wire_shelf(13.2 + S, 14.4, 35.8 + S, 39.8)
-    for y in (1.5, 3.0, 4.5, 6.0):
-        wire_shelf(17.8, 19.3 - S, 17.4 + S, 21.4 - S, y, rod=False)   # linen
-    # laundry: stacked front-load washer/dryer at the back (south) of the closet, facing north
-    for (y0, y1) in [(0.05, 2.95), (3.0, 5.9)]:
-        box("white", 4.6, 7.4, y0, y1, 43.9, 46.5 - S - 0.05, collide=True)
-        box("white", 4.65, 7.35, y1 - 0.45, y1 - 0.05, 43.85, 43.9)              # control panel
-        sphere("steel", 6.0, (y0 + y1) / 2 - 0.2, 43.9, 0.85, sz=0.06)          # door ring
-        sphere("black", 6.0, (y0 + y1) / 2 - 0.2, 43.88, 0.65, sz=0.06)         # door glass
-    wire_shelf(4 + S, 8 - S, 45.4, 46.5 - S, 6.6, rod=False)
+    wire_shelf(6.9, 8 - S, 39.5 + S, 46.5 - S)                          # coat closet rod + shelf
+    # laundry: side-by-side front-load washer + dryer facing the hall
+    for x0 in (13.9, 16.3):
+        box("white", x0, x0 + 2.3, 0, 3.1, 17.4 + S + 0.1, 19.9, collide=True)
+        box("white", x0 + 0.05, x0 + 2.25, 2.6, 3.05, 19.9, 19.95)
+        sphere("steel", x0 + 1.15, 1.4, 19.95, 0.8, sz=0.06)
+        sphere("black", x0 + 1.15, 1.4, 19.97, 0.62, sz=0.06)
+    wire_shelf(13.6, 18.6, 17.4 + S, 18.6, 5.3, rod=False)
     # mech closet: water heater + air handler
     cyl("white", 11.4, -3.4, 0, 5.0, 0.9); COLL.append([10.5, 12.3, -4.3, -2.5])
     box("steel", 13.0, 15.1 - S, 0, 6.5, -4.4 + S, -2.0, collide=True)
@@ -534,6 +540,97 @@ def render(name, eye, target, ortho=False, hide_ceiling=False):
     sc.render.filepath = os.path.join(OUT, f"render_{name}.png")
     bpy.ops.render.render(write_still=True)
 
+# ---------------------------------------------------------------- furniture (placed per the floor-plan drawing)
+def legs(mat, x0, x1, z0, z1, h, t=0.12):
+    for (x, z) in [(x0, z0), (x1 - t, z0), (x0, z1 - t), (x1 - t, z1 - t)]:
+        box(mat, x, x + t, 0, h, z, z + t)
+
+def table(x0, x1, z0, z1, h=2.5, mat="oak"):
+    box(mat, x0, x1, h - 0.12, h, z0, z1, collide=True); legs(mat, x0 + 0.1, x1 - 0.1, z0 + 0.1, z1 - 0.1, h - 0.12)
+
+def chair(x, z, face):            # dining chair; face = direction the sitter looks
+    box("oak", x - 0.75, x + 0.75, 1.45, 1.55, z - 0.75, z + 0.75, collide=True); legs("walnut", x - 0.7, x + 0.7, z - 0.7, z + 0.7, 1.45)
+    dx, dz = {"n": (0, 1), "s": (0, -1), "e": (-1, 0), "w": (1, 0)}[face]   # back sits behind the sitter
+    if dx: box("oak", x + dx * 0.7 - 0.05, x + dx * 0.7 + 0.05, 1.55, 3.0, z - 0.7, z + 0.7)
+    else:  box("oak", x - 0.7, x + 0.7, 1.55, 3.0, z + dz * 0.7 - 0.05, z + dz * 0.7 + 0.05)
+
+def stool(x, z):
+    cyl("walnut", x, z, 2.35, 2.5, 0.6); cyl("black", x, z, 0, 2.35, 0.06, seg=8); cyl("black", x, z, 0.8, 0.85, 0.45)
+    COLL.append([x - 0.6, x + 0.6, z - 0.6, z + 0.6])
+
+def lamp(x, z, y=2.2):
+    cyl("walnut", x, z, y, y + 0.9, 0.08, seg=8); cyl("linen", x, z, y + 0.9, y + 1.6, 0.45)
+
+def plant(x, z, h=4.0):
+    cyl("white", x, z, 0, 1.2, 0.5); sphere("leaf", x, 1.2 + (h - 1.2) / 2, z, 0.9, sy=(h - 1.2) / 1.8)
+    COLL.append([x - 0.5, x + 0.5, z - 0.5, z + 0.5])
+
+def bed(x0, x1, z0, z1, head):      # head = wall the headboard is on
+    box("walnut", x0, x1, 0.3, 1.2, z0, z1, collide=True); legs("walnut", x0, x1, z0, z1, 0.3)
+    box("linen", x0 + 0.05, x1 - 0.05, 1.2, 2.0, z0 + 0.05, z1 - 0.05)
+    box("pillow", x0, x1, 1.55, 2.08, z0, z1)                        # duvet, inset at the head below
+    hx = {"e": (x1 - 0.25, x1), "w": (x0, x0 + 0.25), "n": None, "s": None}[head]
+    if head in "ew":
+        box("fabric", *hx, 0, 4.2, z0, z1)
+        px = x1 - 1.4 if head == "e" else x0 + 0.5
+        box("linen", px - 0.05, px + 1.85, 1.2, 2.12, z0 + 0.05, z1 - 0.05)   # bare sheet at the head
+        for k in (0.25, 0.55):
+            pz = z0 + (z1 - z0) * k - 0.9 + 0.75
+            box("white", px, px + 0.9, 2.0, 2.5, pz, pz + 1.5 if k < 0.5 else pz + 1.4)
+    else:
+        zz = (z0, z0 + 0.25) if head == "n" else (z1 - 0.25, z1)
+        box("fabric", x0, x1, 0, 4.2, *zz)
+        pz = z0 + 0.5 if head == "n" else z1 - 1.4
+        box("linen", x0 + 0.05, x1 - 0.05, 1.2, 2.12, pz - 0.05, pz + 1.85)
+        for k in (0.25, 0.75):
+            px = x0 + (x1 - x0) * k
+            box("white", px - 0.8, px + 0.8, 2.0, 2.5, pz, pz + 0.9)
+
+def nightstand(x, z):
+    box("walnut", x - 0.9, x + 0.9, 0, 2.1, z - 0.8, z + 0.8, collide=True); lamp(x, z, 2.1)
+
+def furnish():
+    # living: sofa on the west wall facing east, rug + coffee table, TV console on the accent wall
+    box("fabric", 0.3, 3.3, 0.3, 1.5, 7.5, 15.0, collide=True)                 # seat base
+    box("fabric", 0.3, 1.0, 1.5, 3.0, 7.5, 15.0)                               # back
+    box("fabric", 0.3, 3.3, 1.5, 2.1, 7.5, 8.1); box("fabric", 0.3, 3.3, 1.5, 2.1, 14.4, 15.0)   # arms
+    for z in (8.1, 10.2, 12.3):
+        box("fabric", 1.0, 3.2, 1.5, 1.85, z + 0.03, z + 2.07)
+    for z in (8.6, 13.4):
+        box("pillow", 1.0, 1.4, 1.7, 2.9, z - 0.6, z + 0.6)
+    box("rug", 4.0, 10.0, 0.0, 0.03, 8.0, 15.5)
+    table(5.4, 7.6, 10.6, 12.9, h=1.4, mat="walnut")
+    box("walnut", 11.1, 12.4, 0, 2.0, 8.2, 14.2, collide=True)                 # media console
+    box("black", 11.85, 12.0, 3.0, 6.0, 8.7, 13.7)                             # TV
+    box("black", 11.5, 12.2, 2.0, 2.05, 10.8, 11.6); box("black", 11.9, 12.0, 2.05, 3.0, 11.1, 11.3)
+    plant(1.0, 5.8); plant(11.6, 15.6, 3.2)
+    # accent chair facing the sofa
+    box("fabric", 8.0, 10.0, 0.3, 1.5, 4.8, 6.8, collide=True); box("fabric", 8.0, 10.0, 1.5, 3.0, 4.8, 5.4)
+    # dining: table with four chairs
+    table(4.7, 8.1, 19.6, 22.6)
+    chair(6.4, 18.8, "s"); chair(6.4, 23.4, "n"); chair(3.9, 21.1, "e"); chair(8.9, 21.1, "w")
+    # peninsula stools (north overhang)
+    for x in (6.8, 8.6, 10.4):
+        stool(x, 26.9)
+    # primary bedroom: queen, headboard on the east wall
+    bed(21.4, 28.2, -1.4, 3.6, "e")
+    nightstand(27.3, -2.6); nightstand(27.3, 4.8)
+    box("walnut", 15.4, 17.0, 0, 3.2, -3.4, 1.4, collide=True)               # dresser on the west wall
+    box("rug", 18.0, 21.0, 0.03, 0.05, -2.0, 4.2)
+    # bedroom 2: full bed, headboard on the north wall
+    bed(20.3, 25.0, 26.2, 32.6, "n")
+    nightstand(19.3, 27.0); nightstand(26.0, 27.0)
+    box("walnut", 13.5, 15.2, 0, 2.6, 29.0, 33.4, collide=True)              # dresser on the west wall
+    box("fabric", 25.6, 27.6, 0.3, 1.5, 33.0, 35.2, collide=True); box("fabric", 27.0, 27.6, 1.5, 3.0, 33.0, 35.2)  # reading chair
+    # balcony: two chairs and a side table
+    for x in (1.5, 6.0):
+        box("walnut", x, x + 1.8, 1.2, 1.35, -4.6, -2.8, collide=True); legs("walnut", x, x + 1.8, -4.6, -2.8, 1.2)
+        box("walnut", x, x + 1.8, 1.35, 2.8, -4.6, -4.45)
+    cyl("walnut", 4.4, -3.6, 0, 1.6, 0.6); COLL.append([3.8, 5.0, -4.2, -3.0])
+    # bath touches: bath mats + towels
+    box("linen", 23.0, 25.5, 0.0, 0.04, 11.5, 13.5); box("linen", 22.0, 24.5, 0.0, 0.04, 21.0, 23.0)
+    box("linen", 26.2, 26.3, 2.2, 3.4, 6.6 + T / 2 + 0.1, 6.6 + T / 2 + 1.6)
+
 def self_check():
     area = sum((r[1] - r[0]) * (r[3] - r[2]) for r in [(0, 12.6, 0, 25.8), (0, 13.2, 25.8, 39.5), (0, 8, 39.5, 46.5), (12.6, 19.3, 17.4, 25.8),
            (12.6, 15.1, 0, 6.6), (10.4, 15.1, -4.4, 0), (21.4, 28.4, 6.6, 10.9), (17.9, 28.4, 10.9, 15.3), (19.3, 28.4, 15.3, 25.8),
@@ -543,22 +640,22 @@ def self_check():
     assert all(c[0] < c[1] and c[2] < c[3] for c in COLL)
     # spawn point and every doorway centre must be walkable (no collider within player radius 0.6 ft)
     free = lambda x, z: not any(c[0] - 0.6 < x < c[1] + 0.6 and c[2] - 0.6 < z < c[3] + 0.6 for c in COLL)
-    for p in [(6.3, 22), (16.5, 6.6), (12.6, 3.3), (15.1, 3.6), (23.1, 6.6), (15.2, 25.8), (23.3, 25.8), (15.2, 35.8), (2.1, 46.5), (4, 41.5), (7.0, -2)]:
+    for p in [(6.3, 17.0), (16.5, 6.6), (12.6, 3.3), (15.1, 3.6), (23.1, 6.6), (15.2, 25.8), (19.3, 23.7), (15.9, 21.4), (15.2, 35.8), (2.1, 46.5), (4, 41.5), (7.0, -2)]:
         assert free(*p), f"blocked doorway at {p}"
 
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True); os.makedirs(WEB, exist_ok=True)
-    build(); self_check(); scene()
+    build(); furnish(); self_check(); scene()
     bpy.ops.wm.save_as_mainfile(filepath=os.path.join(OUT, "unit.blend"))
     bpy.ops.export_scene.gltf(filepath=os.path.join(WEB, "unit.glb"), export_format="GLB", export_lights=False, export_cameras=False)
     with open(os.path.join(WEB, "collision.json"), "w") as f:
         json.dump({"boxes": [[round(v * FT, 3) for v in c] for c in COLL],
                    "lights": [[round(v * FT, 3) for v in p] for p in LIGHTS],
-                   "spawn": [6.3 * FT, 22 * FT], "eye": 5.5 * FT}, f)
+                   "spawn": [6.3 * FT, 17.0 * FT], "eye": 5.5 * FT}, f)
     if "--render" in sys.argv:
         render("living", (6.3, 5.5, 33.5), (6.3, 4.5, 0))
         render("kitchen", (3.0, 5.5, 22.0), (11.0, 3.5, 36.0))
         render("primary_bath", (22.2, 5.5, 7.6), (28.0, 3.5, 13.5))
         render("bedroom2", (17.0, 5.5, 34.5), (28.0, 4.0, 27.0))
-        render("plan", (14.2, 60, 19.3), (14.2, 0, 19.31), ortho=False, hide_ceiling=True)
+        render("plan", (14.2, 60, 20.5), (14.2, 0, 20.49), hide_ceiling=True)   # target nudged north so north is up
     print("done")
