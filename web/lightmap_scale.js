@@ -1,1 +1,1 @@
-window.UNIT_LM_SCALE=3.01646;
+window.UNIT_LM_SCALE=2.80100;
