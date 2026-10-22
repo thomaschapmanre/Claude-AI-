@@ -38,8 +38,8 @@ def make_textures():
     plank = x // (S // 4)
     off = (plank * 197) % S
     tone = rng.uniform(-14, 14, size=8)[plank % 8]
-    grain = 6 * np.sin((x * 0.9 + 12 * np.sin(y * 0.02 + plank)) * 0.35) + rng.normal(0, 3, (S, S))
-    base = np.stack([128, 98, 72], -1)[None, None, :] + (tone + grain)[..., None]
+    grain = 4 * np.sin(x * 0.5 + 3 * np.sin(y * 0.012 + plank)) + rng.normal(0, 2.5, (S, S))
+    base = np.stack([122, 102, 86], -1)[None, None, :] + (tone + grain)[..., None]
     gap = ((x % (S // 4)) < 2) | (((y + off) % S) < 2)
     base[gap] *= 0.6
     save_tex("lvp", base)
@@ -48,7 +48,7 @@ def make_textures():
     save_tex("carpet", np.stack([186, 178, 166], -1)[None, None, :] + n[..., None])
     # granite: white/grey speckle with dark flecks
     g = np.full((S, S, 3), 222.0) + rng.normal(0, 10, (S, S))[..., None]
-    fl = rng.random((S, S))
+    fl = np.kron(rng.random((S // 4, S // 4)), np.ones((4, 4)))  # ~5mm flecks so they read at eye height
     g[fl > 0.93] = [140, 138, 135]
     g[fl > 0.985] = [55, 52, 50]
     g[(fl > 0.9) & (fl < 0.905)] = [196, 170, 150]
@@ -105,7 +105,7 @@ def make_materials():
     mat("Accent_Charcoal", (0.33, 0.31, 0.28), 0.85)
     mat("Trim_Greige", (0.53, 0.50, 0.44), 0.5)
     mat("Ceiling_White", (0.86, 0.86, 0.84), 0.9)
-    mat("Floor_LVP", (1, 1, 1), 0.45, "lvp", 1.2)
+    mat("Floor_LVP", (1, 1, 1), 0.45, "lvp", 0.8)
     mat("Carpet", (1, 1, 1), 1.0, "carpet", 0.5)
     mat("Granite", (1, 1, 1), 0.25, "granite", 0.6)
     mat("Subway_Tile", (1, 1, 1), 0.2, "subway", 0.3)
@@ -270,7 +270,7 @@ def build_structure():
     W("PBath_South", ("H", 10.7), 17.0, 27.85)
     W("Laundry_South", ("H", 16.0), 12.6, 17.0, [(12.95, 16.65, 0, DOOR_H)])
     W("Bath2_Hall", ("H", 16.0), 17.0, 21.5)
-    W("Bath2_West", ("V", 21.5), 16.0, 20.9, [(16.5, 19.0, 0, DOOR_H)])
+    W("Bath2_West", ("V", 21.5), 16.0, 20.9, [(18.2, 20.7, 0, DOOR_H)])
     W("Bed2_North", ("H", 20.9), 14.92 - WALL_T / 2, 27.85, [(15.4, 17.9, 0, DOOR_H)])
     W("Bed2_West", ("V", 14.92), 20.9, 31.2)
     W("Bed2_South", ("H", 31.2), 14.92, 23.3, [(15.4, 17.9, 0, DOOR_H)])
@@ -278,13 +278,13 @@ def build_structure():
     W("Utility_North", ("H", 31.2), 3.3, 6.9, base=False)
 
     # doors (all left open for walking)
-    door("Door_Bed1", ("V", 14.65), 0.2, 2.8, "b", +1)
+    door("Door_Bed1", ("V", 14.65), 0.2, 2.8, "a", +1)  # leaf rests north, clear of the closet door
     door("Door_Closet1", ("H", 3.0), 15.1, 17.4, "a", +1)
     door("Door_PBath", ("H", 3.0), 20.5, 22.9, "b", +1)
-    door("Door_Bath2", ("V", 21.5), 16.5, 19.0, "a", +1)
+    door("Door_Bath2", ("V", 21.5), 18.2, 20.7, "b", +1)  # leaf rests on the north wall
     door("Door_Bed2", ("H", 20.9), 15.4, 17.9, "a", +1)
     door("Door_Closet2", ("H", 31.2), 15.4, 17.9, "a", +1)
-    door("Door_Utility", ("V", 3.3), 32.2, 34.6, "b", -1)
+    door("Door_Utility", ("V", 3.3), 32.2, 34.6, "a", +1)  # opens into the closet, clear of the entry path
     door("Door_Mech", ("V", 10.4), -3.9, -1.5, "a", +1)
     door("Door_Entry", ("H", 36.8), 0.4, 3.1, "a", -1)
     opening_trim("Laundry_Bifold", ("H", 16.0), 12.95, 16.65, 0, DOOR_H)
@@ -300,7 +300,7 @@ def build_structure():
     window("Win_Bed2", ("V", 27.85), 23.2, 26.0, 3, 7.5)
 
     # sliding door to balcony: dark bronze frame, 2 panels
-    for i, (a, b) in enumerate([(4.0, 7.1), (7.0, 10.1)]):
+    for i, (a, b) in enumerate([(4.0, 7.1), (4.2, 7.3)]):  # east panel slid open so the balcony is walkable
         zz = 0.04 if i == 0 else -0.04
         box(f"Slider_Glass{i}", a + 0.15, zz - 0.02, b - 0.15, zz + 0.02, 0.15, 6.75, "Glass", "Windows")
         for j, (p1, p2, h1, h2) in enumerate([(a, a + 0.15, 0, 6.9), (b - 0.15, b, 0, 6.9), (a, b, 0, 0.15), (a, b, 6.75, 6.9)]):
@@ -473,7 +473,7 @@ def build_closets_utility():
         box(f"Laundry_Machine{i}", a + 0.05, lz, b - 0.05, lz + 2.3, 0, 3.0, "Appliance_White", c)
     wire_shelf("Laundry_Shelf", ("H", 12.1), 12.8, 16.8, c, side=+1, h=5.0)
     # mech closet air handler, utility water heater
-    box("Mech_AirHandler", 11.0, -4.5, 13.6, -2.3, 0, 6.0, "Appliance_White", c)
+    box("Mech_AirHandler", 11.6, -4.75, 14.4, -2.7, 0, 6.0, "Appliance_White", c)
     cyl("Utility_WaterHeater", 5.1, 35.2, 1.0, 0, 5.0, "Appliance_White", c)
 
 def build_lighting_fixtures():
@@ -515,15 +515,15 @@ def build_furniture():
     cyl("CoffeeTable", 6.2, 8.8, 1.6, 1.3, 1.45, "Marble_White", c, 8)
     cyl("CoffeeTable_Base", 6.2, 8.8, 0.5, 0, 1.3, "Black_Glass", c, 8)
     box("Armchair_N", 5.2, 2.3, 7.6, 4.6, 0, 2.6, "Fabric_Gray", c)
-    box("LoungeChair_S", 5.0, 12.6, 7.4, 15.0, 0, 1.6, "Fabric_Dark", c)
+    box("LoungeChair_S", 5.0, 10.9, 7.4, 12.5, 0, 1.6, "Fabric_Dark", c)
     box("TV_Console", 11.0, 6.0, 12.6 - WALL_T / 2 - 0.03, 11.0, 0, 1.8, "Wood_Walnut", c)
     box("TV", 11.9, 6.6, 12.05, 10.4, 3.2, 6.0, "Black_Glass", c)
     cyl("SideTable_N", 1.6, 3.4, 0.7, 0, 2.0, "Marble_White", c)
     cyl("SideTable_S", 1.6, 12.8, 0.7, 0, 2.0, "Marble_White", c)
     # dining
-    box("DiningTable_Top", 4.6, 16.0, 7.8, 19.0, 2.4, 2.55, "Marble_White", c)
-    box("DiningTable_Base", 5.9, 17.2, 6.5, 17.8, 0, 2.4, "Black_Glass", c)
-    for i, (x, z) in enumerate([(6.2, 15.2), (6.2, 19.8)]):
+    box("DiningTable_Top", 4.6, 14.2, 7.8, 16.6, 2.4, 2.55, "Marble_White", c)
+    box("DiningTable_Base", 5.9, 15.1, 6.5, 15.7, 0, 2.4, "Black_Glass", c)
+    for i, (x, z) in enumerate([(6.2, 13.4), (6.2, 17.3)]):  # leaves a walkway to the stools
         box(f"DiningChair{i}_Seat", x - 0.8, z - 0.8, x + 0.8, z + 0.8, 1.5, 1.7, "Fabric_Gray", c)
         box(f"DiningChair{i}_Legs", x - 0.7, z - 0.7, x + 0.7, z + 0.7, 0, 1.5, "Black_Glass", c)
     box("Credenza", 11.0, 12.6, 12.6 - WALL_T / 2 - 0.03, 15.6, 0, 2.6, "Wood_Walnut", c)
@@ -622,6 +622,21 @@ def self_check():
     n = sum(1 for o in bpy.data.objects if o.type == "MESH")
     print(f"[check] {n} mesh objects, {len(MATS)} materials, all OK")
 
+def verify_outputs(blend):
+    """Reopen the saved .blend and re-import the .glb; both must bring back every mesh."""
+    n = sum(1 for o in bpy.data.objects if o.type == "MESH")
+    bpy.ops.wm.open_mainfile(filepath=blend)
+    nb = sum(1 for o in bpy.data.objects if o.type == "MESH")
+    missing = [i.filepath for i in bpy.data.images if not os.path.exists(bpy.path.abspath(i.filepath))]
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    bpy.ops.import_scene.gltf(filepath=os.path.join(OUT, "unit_type_f.glb"))
+    ng = sum(1 for o in bpy.data.objects if o.type == "MESH")
+    assert nb == n == ng and not missing, (n, nb, ng, missing)
+    print(f"[verify] .blend reopens with {nb} meshes, .glb re-imports {ng} meshes, textures present")
+    bpy.ops.wm.open_mainfile(filepath=blend)
+    COLL.clear()
+    COLL.update({c.name: c for c in bpy.data.collections})  # old handles died with the reload
+
 def main():
     bpy.ops.wm.read_factory_settings(use_empty=True)
     make_textures()
@@ -643,7 +658,16 @@ def main():
     bpy.ops.wm.save_as_mainfile(filepath=blend)
     bpy.ops.export_scene.gltf(filepath=os.path.join(OUT, "unit_type_f.glb"), export_format="GLB",
                               export_lights=False, export_cameras=False)
+    # FBX for Unreal (metres -> UE centimetres via FBX unit scale, textures embedded)
+    bpy.ops.export_scene.fbx(filepath=os.path.join(OUT, "unit_type_f.fbx"), object_types={"MESH", "EMPTY"},
+                             apply_scale_options="FBX_SCALE_UNITS", path_mode="COPY", embed_textures=True)
+    # web walkthrough loads the model from a script (the artifact host serves .js but not .glb)
+    import base64
+    os.makedirs(os.path.join(HERE, "web"), exist_ok=True)
+    with open(os.path.join(OUT, "unit_type_f.glb"), "rb") as f, open(os.path.join(HERE, "web", "model.js"), "w") as js:
+        js.write('window.UNIT_GLB="' + base64.b64encode(f.read()).decode() + '";')
     print("[saved]", blend)
+    verify_outputs(blend)
     if "--render" in ARGS:
         render("top_down", bpy.data.objects["Cam_Top"], hide=("Ceilings", "Light_Fixtures", "Markers"), samples=32)
         views = [

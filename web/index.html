@@ -1,0 +1,166 @@
+<title>Unit Type F Walkthrough</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Full-screen first-person view; a single dark HUD look on purpose, so the 3D scene stays the focus. */
+:root {
+  --ink: #f2efe9; --dim: #b9b2a6; --panel: rgba(28, 26, 23, 0.72); --line: rgba(242, 239, 233, 0.22); --accent: #d9b88c;
+  --display: "Fraunces", Georgia, serif; --ui: "Work Sans", system-ui, sans-serif;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body { background: #1c1a17; color: var(--ink); font-family: var(--ui); overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
+canvas { display: block; position: fixed; inset: 0; width: 100%; height: 100%; }
+.hud { position: fixed; top: calc(12px + env(safe-area-inset-top, 0px)); left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; pointer-events: none; }
+.room { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; backdrop-filter: blur(6px); }
+.room small { display: block; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dim); }
+.room b { font-family: var(--display); font-weight: 500; font-size: 20px; }
+.help { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; font-size: 12px; line-height: 1.5; color: var(--dim); max-width: 240px; }
+.help kbd { color: var(--ink); font-family: var(--ui); border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; }
+.touch-only { display: none; }
+@media (pointer: coarse) { .touch-only { display: block; } .desk-only { display: none; } }
+#stick { position: fixed; left: calc(28px + env(safe-area-inset-left, 0px)); bottom: calc(28px + env(safe-area-inset-bottom, 0px)); width: 120px; height: 120px; border-radius: 50%; border: 2px solid var(--line); background: rgba(28, 26, 23, 0.35); pointer-events: none; }
+#knob { position: absolute; left: 35px; top: 35px; width: 50px; height: 50px; border-radius: 50%; background: var(--accent); opacity: 0.85; }
+#load[hidden] { display: none; }
+#load { position: fixed; inset: 0; display: grid; place-items: center; background: #1c1a17; font-family: var(--display); font-size: 22px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); text-align: center; }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500&family=Work+Sans:wght@400;500&display=swap">
+
+<div class="hud">
+  <div class="room"><small>Unit Type F · 2 bed / 2 bath</small><b id="room">Entry</b></div>
+  <div class="help">
+    <span class="desk-only">Click to look around · <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> walk · <kbd>Shift</kbd> faster · <kbd>Esc</kbd> release mouse</span>
+    <span class="touch-only">Left thumb: walk · drag anywhere else: look</span>
+  </div>
+</div>
+<div id="stick" class="touch-only"><div id="knob"></div></div>
+<div id="load">Loading the apartment…</div>
+
+<script src="model.js"></script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from "three";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+
+const EYE = 1.65, RADIUS = 0.22, WALK = 1.4, SPRINT = 2.6; // metres, m/s
+const ROOMS = { Living_Dining_Kitchen: "Living / Kitchen", Kitchen_East: "Kitchen", Nook: "Nook", Hall: "Hall", Entry: "Entry",
+  Utility: "Water heater closet", Balcony: "Balcony", Mech: "Mech closet", Primary_Bedroom: "Primary bedroom",
+  Primary_Closet_A: "Primary walk-in", Primary_Closet_B: "Primary walk-in", Primary_Bath: "Primary bath", Primary_Shower: "Primary bath",
+  Laundry: "Laundry", Bath2_A: "Second bath", Bath2_B: "Second bath", Bedroom2: "Second bedroom", Bedroom2_Closet: "Second walk-in" };
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+document.body.prepend(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xb9c8d8);
+scene.add(new THREE.HemisphereLight(0xfff4e6, 0xd9cfc2, 2.4), new THREE.AmbientLight(0xfff1e0, 0.6)); // light bounce from pale floors and walls
+const sun = new THREE.DirectionalLight(0xffffff, 1.2); sun.position.set(-5, 10, -8); scene.add(sun);
+const camera = new THREE.PerspectiveCamera(70, 1, 0.05, 200);
+camera.rotation.order = "YXZ";
+const player = new THREE.Vector3(0.52, EYE, 10.67); // just inside the entry door
+let yaw = 0, pitch = 0;
+function resize() { renderer.setSize(innerWidth, innerHeight); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); }
+addEventListener("resize", resize); resize();
+
+const solids = [], floors = [];
+const glb = Uint8Array.from(atob(window.UNIT_GLB || ""), (c) => c.charCodeAt(0)).buffer;
+new GLTFLoader().parse(glb, "", (g) => {
+  g.scene.traverse((o) => {
+    if (!o.isMesh) return;
+    if (o.name.startsWith("Floor_")) floors.push(o);
+    else if (!/^(Ceiling_|Ground_|Rug)/.test(o.name)) solids.push(o);
+  });
+  scene.add(g.scene);
+  scene.updateMatrixWorld(true);
+  document.getElementById("load").hidden = true;
+  window.__ready = true;
+}, () => { document.getElementById("load").textContent = "The model file did not load. Reload the page to try again."; });
+
+// collision: radial rays at knee and chest height around a candidate position
+const ray = new THREE.Raycaster(); ray.far = RADIUS;
+const DIRS = [...Array(12)].map((_, i) => new THREE.Vector3(Math.cos(i * Math.PI / 6), 0, Math.sin(i * Math.PI / 6)));
+function blocked(p) {
+  for (const h of [0.35, 1.1]) for (const d of DIRS) {
+    ray.set(new THREE.Vector3(p.x, h, p.z), d);
+    if (ray.intersectObjects(solids, false).length) return true;
+  }
+  return false;
+}
+// shortcut: flat single-storey floor, so no gravity/stairs; add a down-ray height snap if levels are ever added
+function tryMove(dx, dz) {
+  const c = player.clone(); c.x += dx; c.z += dz;
+  if (!blocked(c)) return player.copy(c);
+  c.copy(player); c.x += dx; if (!blocked(c)) return player.copy(c);
+  c.copy(player); c.z += dz; if (!blocked(c)) return player.copy(c);
+}
+window.__walk = (dx, dz) => { tryMove(dx, dz); return [player.x, player.z]; }; // test hook
+window.__roomNow = () => { updateRoom(); return window.__room; }; // test hook
+
+const down = new THREE.Raycaster(); const roomEl = document.getElementById("room"); let lastRoom = "";
+function updateRoom() {
+  down.set(player, new THREE.Vector3(0, -1, 0));
+  const hit = down.intersectObjects(floors, false)[0];
+  const name = hit ? (ROOMS[hit.object.name.replace(/^Floor_/, "").replace(/\.\d+$/, "")] || "") : "";
+  if (name && name !== lastRoom) { roomEl.textContent = lastRoom = name; }
+  window.__room = name;
+}
+
+// input
+const keys = {};
+addEventListener("keydown", (e) => { keys[e.code] = true; });
+addEventListener("keyup", (e) => { keys[e.code] = false; });
+const cv = renderer.domElement;
+cv.addEventListener("click", () => { if (matchMedia("(pointer: fine)").matches) cv.requestPointerLock?.()?.catch?.(() => {}); });
+addEventListener("mousemove", (e) => {
+  if (document.pointerLockElement !== cv && !(e.buttons & 1)) return;
+  yaw -= e.movementX * 0.0025; pitch = Math.max(-1.4, Math.min(1.4, pitch - e.movementY * 0.0025));
+});
+const stick = { id: null, x: 0, y: 0, ox: 0, oy: 0 }, look = { id: null, x: 0, y: 0 };
+const knob = document.getElementById("knob");
+addEventListener("touchstart", (e) => {
+  for (const t of e.changedTouches) {
+    if (t.clientX < innerWidth / 2 && stick.id === null) Object.assign(stick, { id: t.identifier, ox: t.clientX, oy: t.clientY, x: 0, y: 0 });
+    else if (look.id === null) Object.assign(look, { id: t.identifier, x: t.clientX, y: t.clientY });
+  }
+}, { passive: true });
+addEventListener("touchmove", (e) => {
+  for (const t of e.changedTouches) {
+    if (t.identifier === stick.id) {
+      const dx = t.clientX - stick.ox, dy = t.clientY - stick.oy, m = Math.min(1, Math.hypot(dx, dy) / 50) / (Math.hypot(dx, dy) || 1);
+      stick.x = dx * m; stick.y = dy * m;
+      knob.style.transform = `translate(${stick.x * 35}px, ${stick.y * 35}px)`;
+    } else if (t.identifier === look.id) {
+      yaw -= (t.clientX - look.x) * 0.005; pitch = Math.max(-1.4, Math.min(1.4, pitch - (t.clientY - look.y) * 0.005));
+      look.x = t.clientX; look.y = t.clientY;
+    }
+  }
+}, { passive: true });
+addEventListener("touchend", (e) => {
+  for (const t of e.changedTouches) {
+    if (t.identifier === stick.id) { stick.id = null; stick.x = stick.y = 0; knob.style.transform = ""; }
+    if (t.identifier === look.id) look.id = null;
+  }
+});
+
+let last = performance.now();
+renderer.setAnimationLoop((now) => {
+  const dt = Math.min(0.05, (now - last) / 1000); last = now;
+  let f = (keys.KeyW || keys.ArrowUp ? 1 : 0) - (keys.KeyS || keys.ArrowDown ? 1 : 0) - stick.y;
+  let s = (keys.KeyD || keys.ArrowRight ? 1 : 0) - (keys.KeyA || keys.ArrowLeft ? 1 : 0) + stick.x;
+  const len = Math.hypot(f, s);
+  if (len > 1) { f /= len; s /= len; }
+  if (window.__ready && len > 0.05) {
+    const v = (keys.ShiftLeft || keys.ShiftRight ? SPRINT : WALK) * dt;
+    const sin = Math.sin(yaw), cos = Math.cos(yaw);
+    tryMove((-sin * f + cos * s) * v, (-cos * f - sin * s) * v);
+  }
+  if (window.__ready) updateRoom();
+  camera.position.copy(player); camera.rotation.set(pitch, yaw, 0);
+  renderer.render(scene, camera);
+});
+</script>
