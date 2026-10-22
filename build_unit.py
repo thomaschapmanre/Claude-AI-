@@ -637,7 +637,7 @@ def verify_outputs(blend):
     COLL.clear()
     COLL.update({c.name: c for c in bpy.data.collections})  # old handles died with the reload
 
-def bake_lightmap(size=4096, samples=64):
+def bake_lightmap(size=1024, samples=16):  # CPU bake: 4096@64 did not finish in 2 h; ~5 cm texels is enough for soft room light
     """Bake sun, sky and ceiling-light bounce into one shared lightmap atlas (2nd UV channel)."""
     from PIL import ImageFilter
     skip = {"Glass", "Frosted_Glass", "Light_Glow", "Grass", "Asphalt"}
@@ -654,6 +654,7 @@ def bake_lightmap(size=4096, samples=64):
     bpy.ops.uv.smart_project(angle_limit=math.radians(60), island_margin=0.0)
     bpy.ops.uv.average_islands_scale()  # same texel size everywhere, so big walls get big islands
     bpy.ops.uv.pack_islands(rotate=True, margin=0.0015)
+    print("[bake] UVs packed", flush=True)
     bpy.ops.object.mode_set(mode="OBJECT")
     img = bpy.data.images.new("Lightmap", size, size, float_buffer=True)
     for m in {o.data.materials[0] for o in obs}:
@@ -664,7 +665,9 @@ def bake_lightmap(size=4096, samples=64):
     sc.render.engine = "CYCLES"
     sc.cycles.device = "CPU"
     sc.cycles.samples = samples
-    sc.render.bake.margin = 6
+    sc.cycles.max_bounces = 3
+    sc.render.bake.margin = 4
+    print("[bake] baking...", flush=True)
     bpy.ops.object.bake(type="DIFFUSE", pass_filter={"DIRECT", "INDIRECT"}, uv_layer="Lightmap", use_clear=True)
     for m in {o.data.materials[0] for o in obs}:
         m.node_tree.nodes.remove(m.node_tree.nodes.active)
