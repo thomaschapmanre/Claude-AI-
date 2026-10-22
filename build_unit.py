@@ -637,7 +637,7 @@ def verify_outputs(blend):
     COLL.clear()
     COLL.update({c.name: c for c in bpy.data.collections})  # old handles died with the reload
 
-def bake_lightmap(size=1024, samples=16):  # CPU bake: 4096@64 did not finish in 2 h; ~5 cm texels is enough for soft room light
+def bake_lightmap(size=1024, samples=128):  # ~5 cm texels is enough for soft room light; fewer samples looks blotchy
     """Bake sun, sky and ceiling-light bounce into one shared lightmap atlas (2nd UV channel)."""
     from PIL import ImageFilter
     skip = {"Glass", "Frosted_Glass", "Light_Glow", "Grass", "Asphalt"}

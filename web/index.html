@@ -81,6 +81,7 @@ new GLTFLoader().parse(glb, "", (g) => {
       o.material.lightMap = lightMap;
       o.material.lightMapIntensity = window.UNIT_LM_SCALE * Math.PI; // Blender bakes radiance/albedo; three wants irradiance
     }
+    else if (lightMap && o.name.startsWith("Ground_")) o.material = new THREE.MeshBasicMaterial({ color: o.material.color }); // outdoors is not baked; show it sunlit
     if (o.name.startsWith("Floor_")) floors.push(o);
     else if (!/^(Ceiling_|Ground_|Rug)/.test(o.name)) solids.push(o);
   });
