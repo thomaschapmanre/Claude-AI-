@@ -637,6 +637,51 @@ def verify_outputs(blend):
     COLL.clear()
     COLL.update({c.name: c for c in bpy.data.collections})  # old handles died with the reload
 
+def bake_lightmap(size=4096, samples=64):
+    """Bake sun, sky and ceiling-light bounce into one shared lightmap atlas (2nd UV channel)."""
+    from PIL import ImageFilter
+    skip = {"Glass", "Frosted_Glass", "Light_Glow", "Grass", "Asphalt"}
+    obs = [o for o in bpy.data.objects if o.type == "MESH" and o.data.materials[0].name not in skip]
+    for o in obs:
+        o.data.uv_layers.new(name="Lightmap")
+        o.data.uv_layers.active = o.data.uv_layers["Lightmap"]
+    bpy.ops.object.select_all(action="DESELECT")
+    for o in obs:
+        o.select_set(True)
+    bpy.context.view_layer.objects.active = obs[0]
+    bpy.ops.object.mode_set(mode="EDIT")
+    bpy.ops.mesh.select_all(action="SELECT")
+    bpy.ops.uv.smart_project(angle_limit=math.radians(60), island_margin=0.0)
+    bpy.ops.uv.average_islands_scale()  # same texel size everywhere, so big walls get big islands
+    bpy.ops.uv.pack_islands(rotate=True, margin=0.0015)
+    bpy.ops.object.mode_set(mode="OBJECT")
+    img = bpy.data.images.new("Lightmap", size, size, float_buffer=True)
+    for m in {o.data.materials[0] for o in obs}:
+        n = m.node_tree.nodes.new("ShaderNodeTexImage")
+        n.image = img
+        m.node_tree.nodes.active = n
+    sc = bpy.context.scene
+    sc.render.engine = "CYCLES"
+    sc.cycles.device = "CPU"
+    sc.cycles.samples = samples
+    sc.render.bake.margin = 6
+    bpy.ops.object.bake(type="DIFFUSE", pass_filter={"DIRECT", "INDIRECT"}, uv_layer="Lightmap", use_clear=True)
+    for m in {o.data.materials[0] for o in obs}:
+        m.node_tree.nodes.remove(m.node_tree.nodes.active)
+    for o in obs:
+        o.data.uv_layers.active = o.data.uv_layers[0]  # texture UVs stay first (glTF TEXCOORD_0)
+    px = np.empty(size * size * 4, np.float32)
+    img.pixels.foreach_get(px)
+    lm = px.reshape(size, size, 4)[::-1, :, :3]  # Blender rows are bottom-up
+    scale = float(np.percentile(lm[lm.sum(-1) > 0], 99.5)) or 1.0
+    enc = (np.clip(lm / scale, 0, 1) ** (1 / 2.2) * 255).astype(np.uint8)
+    out = Image.fromarray(enc).filter(ImageFilter.MedianFilter(3)).filter(ImageFilter.GaussianBlur(1))  # shortcut: blur instead of a real denoiser; raise samples if shadows look smeared
+    os.makedirs(os.path.join(HERE, "web"), exist_ok=True)
+    out.save(os.path.join(HERE, "web", "lightmap.jpg"), quality=90)
+    with open(os.path.join(HERE, "web", "lightmap_scale.js"), "w") as f:
+        f.write(f"window.UNIT_LM_SCALE={scale:.5f};")
+    print(f"[bake] {len(obs)} objects baked into {size}px lightmap, scale {scale:.3f}")
+
 def main():
     bpy.ops.wm.read_factory_settings(use_empty=True)
     make_textures()
@@ -651,6 +696,8 @@ def main():
     build_lights()
     spawn_and_cameras()
     self_check()
+    if "--bake" in ARGS:
+        bake_lightmap()
     sc = bpy.context.scene
     sc.unit_settings.system = "IMPERIAL"
     sc.unit_settings.length_unit = "FEET"

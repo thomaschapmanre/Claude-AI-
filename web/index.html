@@ -36,6 +36,7 @@ canvas { display: block; position: fixed; inset: 0; width: 100%; height: 100%; }
 <div id="load">Loading the apartment…</div>
 
 <script src="model.js"></script>
+<script src="lightmap_scale.js"></script>
 <script type="importmap">
 { "imports": {
   "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
@@ -58,8 +59,12 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 document.body.prepend(renderer.domElement);
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xb9c8d8);
-scene.add(new THREE.HemisphereLight(0xfff4e6, 0xd9cfc2, 2.4), new THREE.AmbientLight(0xfff1e0, 0.6)); // light bounce from pale floors and walls
-const sun = new THREE.DirectionalLight(0xffffff, 1.2); sun.position.set(-5, 10, -8); scene.add(sun);
+const BAKED = !!window.UNIT_LM_SCALE;
+// with the baked lightmap, live lights only add a little sheen; without it they do all the lighting
+scene.add(new THREE.HemisphereLight(0xfff4e6, 0xd9cfc2, BAKED ? 0.35 : 2.4), new THREE.AmbientLight(0xfff1e0, BAKED ? 0 : 0.6));
+if (!BAKED) { const sun = new THREE.DirectionalLight(0xffffff, 1.2); sun.position.set(-5, 10, -8); scene.add(sun); }
+const lightMap = BAKED ? new THREE.TextureLoader().load("lightmap.jpg") : null;
+if (lightMap) { lightMap.flipY = false; lightMap.colorSpace = THREE.SRGBColorSpace; lightMap.channel = 1; }
 const camera = new THREE.PerspectiveCamera(70, 1, 0.05, 200);
 camera.rotation.order = "YXZ";
 const player = new THREE.Vector3(0.52, EYE, 10.67); // just inside the entry door
@@ -72,6 +77,10 @@ const glb = Uint8Array.from(atob(window.UNIT_GLB || ""), (c) => c.charCodeAt(0))
 new GLTFLoader().parse(glb, "", (g) => {
   g.scene.traverse((o) => {
     if (!o.isMesh) return;
+    if (lightMap && o.geometry.attributes.uv1) {
+      o.material.lightMap = lightMap;
+      o.material.lightMapIntensity = window.UNIT_LM_SCALE * Math.PI; // Blender bakes radiance/albedo; three wants irradiance
+    }
     if (o.name.startsWith("Floor_")) floors.push(o);
     else if (!/^(Ceiling_|Ground_|Rug)/.test(o.name)) solids.push(o);
   });

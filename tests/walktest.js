@@ -10,7 +10,7 @@ const WEB = process.argv[2], OUT = process.argv[3];
     const u = r.request().url();
     if (u.startsWith('https://cdn.jsdelivr.net/npm/three@0.160.0/')) return r.fulfill({ path: path.join(NM, u.split('three@0.160.0/')[1]), contentType: 'text/javascript' });
     if (u.startsWith('https://fonts.')) return r.abort();
-    if (u.startsWith('http://t/')) { const f = path.join(WEB, u.slice(9) || 'index.html'); return r.fulfill({ path: f, contentType: f.endsWith('.html') ? 'text/html; charset=utf-8' : 'text/javascript' }); }
+    if (u.startsWith('http://t/')) { const f = path.join(WEB, u.slice(9) || 'index.html'); return r.fulfill({ path: f, contentType: f.endsWith('.html') ? 'text/html; charset=utf-8' : f.endsWith('.jpg') ? 'image/jpeg' : 'text/javascript' }); }
     r.continue();
   });
   await p.goto('http://t/index.html');
