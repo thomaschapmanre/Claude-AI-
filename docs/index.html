@@ -3,222 +3,257 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Chapman Notary Services | NYS Notary Public, Western New York</title>
-<meta name="description" content="Chapman Notary Services: commissioned New York State Notary Public offering in-person and mobile notarizations in Erie and Cattaraugus Counties. $2 per signature as set by NYS law.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231b2a4a'/><text x='16' y='22' font-family='Georgia,serif' font-size='16' font-weight='bold' fill='%23c9a227' text-anchor='middle'>CN</text></svg>">
+<title>Chapman Notary Services | Notary Public, Western New York</title>
+<meta name="description" content="Commissioned New York State Notary Public offering in-person and mobile notarizations in Erie and Cattaraugus Counties. $2 per signature, as set by NYS law.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='15' fill='%23FAFAF7' stroke='%239C7A2B' stroke-width='2'/><text x='16' y='21' font-family='Georgia,serif' font-size='13' fill='%231B2B48' text-anchor='middle'>CN</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:wght@400;700&family=Public+Sans:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --navy: #1b2a4a;
-    --gold: #c9a227;
-    --ink: #1f2933;
-    --muted: #52606d;
-    --bg: #ffffff;
-    --soft: #f4f6f9;
-    --line: #dde3ea;
+    --paper: #FAFAF7;
+    --ink: #1B2B48;
+    --ink-soft: #4A5874;
+    --brass: #9C7A2B;
+    --rule: #D9DCE3;
+    --stamp: #8E2B2B;
+    --serif: "Libre Caslon Text", Georgia, serif;
+    --sans: "Public Sans", system-ui, sans-serif;
   }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
-  body { margin: 0; font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink); background: var(--bg); }
-  a { color: var(--navy); }
-  .wrap { max-width: 960px; margin: 0 auto; padding: 0 16px; }
-  section { padding: 56px 0; scroll-margin-top: 72px; }
-  section:nth-of-type(even) { background: var(--soft); }
-  h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; color: var(--navy); line-height: 1.25; }
-  h2 { font-size: 1.9rem; margin: 0 0 16px; }
-  h2::after { content: ""; display: block; width: 56px; height: 3px; background: var(--gold); margin-top: 10px; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 1.0625rem/1.65 var(--sans); }
+  a { color: var(--ink); text-underline-offset: 3px; }
+  :focus-visible { outline: 3px solid var(--brass); outline-offset: 2px; }
+  .wrap { max-width: 44rem; margin: 0 auto; padding: 0 16px; }
 
-  /* Header + text logo */
-  header { position: sticky; top: 0; z-index: 10; background: var(--navy); color: #fff; }
-  header .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding-top: 10px; padding-bottom: 10px; }
-  .logo { display: flex; align-items: center; gap: 10px; color: #fff; text-decoration: none; }
-  .logo-mark { width: 40px; height: 40px; border: 2px solid var(--gold); border-radius: 50%; display: grid; place-items: center; font: bold 15px Georgia, serif; color: var(--gold); letter-spacing: 1px; }
-  .logo-text { font-family: Georgia, serif; line-height: 1.1; }
-  .logo-text strong { display: block; font-size: 1.15rem; }
-  .logo-text span { font-size: .72rem; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); }
-  nav ul { list-style: none; display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0; padding: 0; }
-  nav a { color: #fff; text-decoration: none; font-size: .95rem; }
-  nav a:hover, nav a:focus { color: var(--gold); }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 400; line-height: 1.2; margin: 0; }
+  h1 { font-size: clamp(2rem, 7vw, 3rem); }
+  h2 { font-size: 1.75rem; margin-bottom: 1rem; }
+  h3 { font-size: 1.2rem; margin: 2rem 0 .5rem; }
+  p { margin: 0 0 1rem; }
 
-  /* Hero */
-  .hero { background: linear-gradient(135deg, var(--navy), #2c4170); color: #fff; padding: 72px 0; }
-  .hero h1 { color: #fff; font-size: clamp(1.9rem, 5vw, 2.8rem); margin: 0 0 12px; }
-  .hero p { font-size: 1.1rem; max-width: 640px; color: #e6ebf2; }
-  .btns { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
-  .btn { display: inline-block; padding: 12px 22px; border-radius: 6px; font-weight: 600; text-decoration: none; border: 2px solid var(--gold); }
-  .btn-gold { background: var(--gold); color: var(--navy); }
-  .btn-outline { color: #fff; }
-  .btn-navy { background: var(--navy); color: #fff; border-color: var(--navy); }
+  /* Header */
+  header { border-bottom: 1px solid var(--rule); background: var(--paper); position: sticky; top: 0; z-index: 5; }
+  header .wrap { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 24px; padding-top: 12px; padding-bottom: 12px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-family: var(--serif); font-size: 1.1rem; }
+  .brand svg { width: 36px; height: 36px; }
+  nav ul { list-style: none; display: flex; flex-wrap: wrap; gap: 4px 20px; margin: 0; padding: 0; font-size: .95rem; }
+  nav a { text-decoration: none; color: var(--ink-soft); }
+  nav a:hover { color: var(--ink); text-decoration: underline; }
 
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
-  .card { background: #fff; border: 1px solid var(--line); border-top: 3px solid var(--gold); border-radius: 8px; padding: 20px; }
-  .card h3 { margin: 0 0 8px; font-size: 1.2rem; }
-  .card p { margin: 0; color: var(--muted); }
+  section { padding: 64px 0; border-bottom: 1px solid var(--rule); scroll-margin-top: 64px; }
 
-  table { width: 100%; border-collapse: collapse; background: #fff; margin: 16px 0; }
-  th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
-  th { background: var(--navy); color: #fff; font-weight: 600; }
-  td:last-child { white-space: nowrap; font-weight: 600; }
+  /* Hero: the seal is the one bold element */
+  .hero { padding: 48px 0 64px; }
+  .seal { display: block; width: min(220px, 60vw); height: auto; margin: 0 0 32px; color: var(--brass); }
+  .seal text { font-family: var(--serif); }
+  @media (prefers-reduced-motion: no-preference) {
+    .seal { animation: press .9s cubic-bezier(.2, .7, .2, 1) both; }
+    @keyframes press { from { opacity: 0; transform: scale(1.08); } to { opacity: 1; transform: none; } }
+  }
+  .lede { font-size: 1.2rem; color: var(--ink-soft); max-width: 34rem; margin-top: 16px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+  .btn { display: inline-block; padding: 12px 22px; border-radius: 4px; font: 600 1rem var(--sans); text-decoration: none; border: 1.5px solid var(--ink); cursor: pointer; }
+  .btn-primary { background: var(--ink); color: var(--paper); }
+  .btn-secondary { background: transparent; color: var(--ink); }
 
-  .notice { background: #fff8e1; border-left: 4px solid var(--gold); padding: 14px 16px; border-radius: 4px; margin: 16px 0; }
-  .creds { list-style: none; padding: 0; }
-  .creds li { padding: 6px 0; border-bottom: 1px dashed var(--line); }
+  /* Services */
+  .services { list-style: none; padding: 0; margin: 0; }
+  .services li { padding: 16px 0; border-top: 1px solid var(--rule); }
+  .services li:last-child { border-bottom: 1px solid var(--rule); }
+  .services strong { display: block; font-family: var(--serif); font-weight: 400; font-size: 1.15rem; }
+  .services span { color: var(--ink-soft); }
 
-  details { background: #fff; border: 1px solid var(--line); border-radius: 6px; margin: 10px 0; padding: 0 16px; }
-  summary { cursor: pointer; padding: 14px 0; font-weight: 600; color: var(--navy); }
-  details[open] summary { border-bottom: 1px solid var(--line); margin-bottom: 8px; }
+  /* Fee schedule, printed-document style with dotted leaders */
+  .schedule { border: 1.5px solid var(--ink); padding: 24px 20px; margin-top: 32px; background: #fff; }
+  .schedule h3 { margin: 0 0 4px; }
+  .schedule .note { font-size: .9rem; color: var(--ink-soft); }
+  .fee { display: flex; align-items: baseline; gap: 8px; padding: 10px 0; }
+  .fee span:first-child { flex: 0 1 auto; }
+  .fee .leader { flex: 1 1 24px; border-bottom: 2px dotted var(--rule); transform: translateY(-4px); }
+  .fee span:last-child { font-family: var(--serif); white-space: nowrap; }
+  .schedule hr { border: 0; border-top: 1px solid var(--rule); margin: 16px 0; }
 
-  form { display: grid; gap: 12px; max-width: 560px; }
-  label { font-weight: 600; font-size: .95rem; }
-  input, select, textarea { width: 100%; padding: 10px; font: inherit; border: 1px solid #b8c2cc; border-radius: 6px; }
-  input:focus, select:focus, textarea:focus { outline: 2px solid var(--gold); border-color: var(--gold); }
-  .hidden { display: none; }
+  /* How it works: a real sequence, so it's numbered */
+  .steps { padding-left: 1.4rem; margin: 0; }
+  .steps li { padding-left: .4rem; margin-bottom: 12px; }
+  .steps li::marker { font-family: var(--serif); color: var(--brass); }
 
-  footer { background: var(--navy); color: #cfd8e3; padding: 32px 0; font-size: .9rem; }
-  footer strong { color: #fff; }
-  footer a { color: var(--gold); }
+  dl.creds { display: grid; grid-template-columns: max-content 1fr; gap: 6px 20px; margin: 24px 0; }
+  dl.creds dt { color: var(--ink-soft); }
+  dl.creds dd { margin: 0; }
+  @media (max-width: 420px) { dl.creds { grid-template-columns: 1fr; gap: 0; } dl.creds dd { margin-bottom: 10px; } }
+
+  .disclaimer { border-left: 3px solid var(--stamp); padding: 4px 0 4px 16px; color: var(--stamp); margin: 24px 0 0; }
+
+  /* FAQ */
+  details { border-top: 1px solid var(--rule); }
+  details:last-of-type { border-bottom: 1px solid var(--rule); }
+  summary { cursor: pointer; padding: 16px 0; font-family: var(--serif); font-size: 1.1rem; list-style-position: outside; }
+  details > :not(summary) { color: var(--ink-soft); }
+  details ul { padding-left: 1.2rem; }
+
+  /* Form */
+  form { display: grid; gap: 16px; margin-top: 16px; }
+  label { display: block; font-weight: 600; font-size: .95rem; margin-bottom: 4px; }
+  input, select, textarea { width: 100%; padding: 11px 12px; font: inherit; color: var(--ink); background: #fff; border: 1px solid #A9B0BF; border-radius: 4px; }
+  .hp { display: none; }
+
+  footer { padding: 40px 0 56px; font-size: .9rem; color: var(--ink-soft); }
+  footer p { margin-bottom: .5rem; }
 </style>
 </head>
 <body>
 
 <header>
   <div class="wrap">
-    <a class="logo" href="#home" aria-label="Chapman Notary Services home">
-      <span class="logo-mark" aria-hidden="true">CN</span>
-      <span class="logo-text"><strong>Chapman Notary Services</strong><span>NYS Notary Public</span></span>
+    <a class="brand" href="#top">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="none" stroke="#9C7A2B" stroke-width="2"/><circle cx="20" cy="20" r="14" fill="none" stroke="#9C7A2B" stroke-width="1"/><text x="20" y="25" text-anchor="middle" font-family="Georgia,serif" font-size="13" fill="#1B2B48">CN</text></svg>
+      Chapman Notary Services
     </a>
     <nav aria-label="Main">
       <ul>
-        <li><a href="#services">Services &amp; Fees</a></li>
+        <li><a href="#services">Services &amp; fees</a></li>
         <li><a href="#about">About</a></li>
         <li><a href="#faq">FAQ</a></li>
-        <li><a href="#contact">Book</a></li>
+        <li><a href="#book">Book</a></li>
       </ul>
     </nav>
   </div>
 </header>
 
-<main>
-<section class="hero" id="home">
+<main id="top">
+<section class="hero">
   <div class="wrap">
-    <h1>Reliable, by-the-book notary service in Western New York</h1>
-    <p>In-person and mobile notarizations from a commissioned New York State Notary Public. Fees follow NYS law. Serving Erie and Cattaraugus Counties, by appointment.</p>
-    <div class="btns">
-      <a class="btn btn-gold" href="tel:+17164905006">Call 716.490.5006</a>
-      <a class="btn btn-outline" href="sms:+17164905006">Text to book</a>
+    <svg class="seal" viewBox="0 0 200 200" role="img" aria-label="Chapman Notary Services seal">
+      <!-- top arc runs over the top, bottom arc under it, so both read upright -->
+      <defs><path id="arc-top" d="M28.5,119.2 A74,74 0 1,1 171.5,119.2"/><path id="arc-bottom" d="M15,100 A85,85 0 0,0 185,100"/></defs>
+      <circle cx="100" cy="100" r="96" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="2 4"/>
+      <circle cx="100" cy="100" r="90" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <circle cx="100" cy="100" r="58" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <text font-size="13" letter-spacing="1" fill="currentColor" text-anchor="middle"><textPath href="#arc-top" startOffset="50%">CHAPMAN NOTARY SERVICES</textPath></text>
+      <text font-size="13" letter-spacing="1" fill="currentColor" text-anchor="middle"><textPath href="#arc-bottom" startOffset="50%">WESTERN NEW YORK</textPath></text>
+      <text x="27.5" y="138" font-size="11" fill="currentColor" text-anchor="middle">✦</text>
+      <text x="172.5" y="138" font-size="11" fill="currentColor" text-anchor="middle">✦</text>
+      <text x="100" y="114" text-anchor="middle" font-size="44" fill="#1B2B48">CN</text>
+    </svg>
+    <h1>Notary public for Erie and Cattaraugus Counties</h1>
+    <p class="lede">$2 a signature, as set by New York law. Meet me in person, or I'll come to your home, office, or care facility.</p>
+    <div class="actions">
+      <a class="btn btn-primary" href="tel:+17164905006">Call 716.490.5006</a>
+      <a class="btn btn-secondary" href="sms:+17164905006">Text to book</a>
     </div>
   </div>
 </section>
 
 <section id="services">
   <div class="wrap">
-    <h2>Services &amp; Fees</h2>
-    <div class="grid">
-      <div class="card"><h3>In-Person Notarizations</h3><p>Acknowledgments, jurats, oaths and affirmations at an agreed meeting place.</p></div>
-      <div class="card"><h3>Mobile Notary</h3><p>I come to you: home, office, hospital, or care facility. Travel fee based on distance, quoted before the appointment.</p></div>
-      <div class="card"><h3>Apostille Guidance</h3><p>I notarize your documents and explain the general county clerk and NYS Department of State authentication steps. I don't issue apostilles.</p></div>
-      <div class="card"><h3>Witness Services</h3><p>Available to serve as a witness when a document calls for one.</p></div>
+    <h2>Services &amp; fees</h2>
+    <ul class="services">
+      <li><strong>In-person notarization</strong><span>Acknowledgments, jurats, oaths, and affirmations at an agreed meeting place.</span></li>
+      <li><strong>Mobile notary</strong><span>I travel to you. The travel fee depends on distance and is quoted before we book.</span></li>
+      <li><strong>Apostille guidance</strong><span>I notarize your documents and walk you through the county clerk and NYS Department of State steps. I don't issue apostilles.</span></li>
+      <li><strong>Witness services</strong><span>I can serve as a witness when your document calls for one.</span></li>
+    </ul>
+
+    <div class="schedule">
+      <h3>Fee schedule</h3>
+      <p class="note">Notary fees are set by New York State law.</p>
+      <div class="fee"><span>Acknowledgment or proof, per signature</span><span class="leader"></span><span>$2.00</span></div>
+      <div class="fee"><span>Oath, affirmation, or affidavit, per signature</span><span class="leader"></span><span>$2.00</span></div>
+      <div class="fee"><span>Electronic notarization</span><span class="leader"></span><span>up to $25.00</span></div>
+      <hr>
+      <div class="fee"><span>Travel fee (mobile service)</span><span class="leader"></span><span>quoted in advance</span></div>
+      <p class="note">The travel fee is a separate charge for my time and travel, agreed before the appointment. It is not a notary fee.</p>
     </div>
 
-    <h3>Fee Schedule (set by New York State law)</h3>
-    <table>
-      <thead><tr><th>Service</th><th>Fee</th></tr></thead>
-      <tbody>
-        <tr><td>Acknowledgment or proof of execution, per signature</td><td>$2.00</td></tr>
-        <tr><td>Oath or affirmation (including jurats/affidavits), per signature</td><td>$2.00</td></tr>
-        <tr><td>Electronic notarization (NYS maximum)</td><td>Up to $25.00</td></tr>
-      </tbody>
-    </table>
-
-    <h3>Travel Fee (separate from notary fees)</h3>
-    <table>
-      <thead><tr><th>Mobile service</th><th>Fee</th></tr></thead>
-      <tbody>
-        <tr><td>Travel to your location, based on distance. Quoted and agreed to before the appointment.</td><td>Quoted in advance</td></tr>
-      </tbody>
-    </table>
-    <p class="notice">The travel fee is a separate charge for my time and travel. It is not a notarial fee. Notarial fees are never more than NYS law allows.</p>
+    <h3>How it works</h3>
+    <ol class="steps">
+      <li>Call or text with your document type, number of signers, and where you'd like to meet.</li>
+      <li>Bring the document unsigned, plus a current photo ID for each signer.</li>
+      <li>You sign in front of me, I complete the notarization, and you pay the fee.</li>
+    </ol>
   </div>
 </section>
 
 <section id="about">
   <div class="wrap">
     <h2>About</h2>
-    <p>I'm Thomas Chapman, a commissioned New York State Notary Public. I started Chapman Notary Services to give Western New York residents and businesses a prompt, careful, and fairly priced notary they can count on.</p>
-    <ul class="creds">
-      <li><strong>Commission #:</strong> 01CH0055866</li>
-      <li><strong>Qualified in:</strong> Cattaraugus County</li>
-      <li><strong>Commission expires:</strong> October 19, 2026</li>
-      <li><strong>Service area:</strong> Erie &amp; Cattaraugus Counties, Western New York</li>
-      <li><strong>Hours:</strong> Mon–Sat, 8am–8pm, by appointment only</li>
-    </ul>
-    <p class="notice"><strong>Disclaimer:</strong> I am not an attorney licensed to practice law in the State of New York and may not give legal advice about immigration or any other legal matter or accept fees for legal advice.</p>
+    <p>I'm Thomas Chapman, a commissioned New York State Notary Public. I started Chapman Notary Services so people in Western New York have a prompt, careful notary who shows up on time and charges what the law allows.</p>
+    <dl class="creds">
+      <dt>Commission number</dt><dd>01CH0055866</dd>
+      <dt>Qualified in</dt><dd>Cattaraugus County</dd>
+      <dt>Commission expires</dt><dd>October 19, 2026</dd>
+      <dt>Service area</dt><dd>Erie and Cattaraugus Counties</dd>
+      <dt>Hours</dt><dd>Monday to Saturday, 8am to 8pm, by appointment</dd>
+    </dl>
+    <p class="disclaimer">I am not an attorney licensed to practice law in the State of New York and may not give legal advice about immigration or any other legal matter or accept fees for legal advice.</p>
   </div>
 </section>
 
 <section id="faq">
   <div class="wrap">
-    <h2>FAQ</h2>
+    <h2>Questions</h2>
     <details>
-      <summary>What ID do I need to bring?</summary>
-      <p>A current, unexpired government-issued photo ID, such as a driver's license, non-driver state ID, U.S. or foreign passport, or military ID. The name on your ID should match the name on the document. Every person signing needs their own ID.</p>
+      <summary>What ID should I bring?</summary>
+      <p>A current, unexpired government photo ID: driver's license, non-driver state ID, passport, or military ID. The name should match the name on your document. Each signer needs their own ID.</p>
     </details>
     <details>
-      <summary>Should I sign my document before we meet?</summary>
-      <p>No. Bring it unsigned. You'll sign in front of me after I verify your identity.</p>
+      <summary>Should I sign before we meet?</summary>
+      <p>No. Bring the document unsigned. You'll sign in front of me after I check your ID.</p>
     </details>
     <details>
       <summary>What can't a notary do?</summary>
       <ul>
         <li>Give legal advice or tell you which form you need</li>
         <li>Prepare, draft, or fill in legal documents for you</li>
-        <li>Notarize a signature if the signer isn't physically present (or, for electronic notarization, on a lawful audio-video call)</li>
+        <li>Notarize for a signer who isn't present (in person, or on a lawful video call for electronic notarization)</li>
         <li>Notarize a document with blank spaces</li>
-        <li>Notarize for someone who appears not to understand the document or is being pressured to sign</li>
+        <li>Notarize for someone who seems not to understand the document or is being pressured</li>
         <li>Certify copies of documents, including birth, death, or marriage certificates</li>
-        <li>Notarize a document in which I have a personal or financial interest</li>
+        <li>Notarize a document I have a personal or financial interest in</li>
         <li>Issue an apostille (only the NYS Department of State can)</li>
       </ul>
     </details>
     <details>
       <summary>How much will it cost?</summary>
-      <p>$2 per signature for in-person notarizations, as set by NYS law. Electronic notarizations are up to $25. If I travel to you, there's a separate travel fee that I quote before the appointment.</p>
+      <p>$2 per signature, as set by New York law. Electronic notarizations are up to $25. If I travel to you, the travel fee is quoted before we book.</p>
     </details>
     <details>
-      <summary>Can you help with my will, immigration papers, or other legal matter?</summary>
-      <p>I can notarize signatures on documents you've already prepared, but I can't advise you on them. For legal questions, please talk to a licensed New York attorney.</p>
+      <summary>Can you help with my will or immigration papers?</summary>
+      <p>I can notarize signatures on documents you've already prepared, but I can't advise you on them. For legal questions, talk to a licensed New York attorney.</p>
     </details>
   </div>
 </section>
 
-<section id="contact">
+<section id="book">
   <div class="wrap">
-    <h2>Contact &amp; Book</h2>
-    <p>The fastest way to book is to call or text. Include the document type, number of signers, and where you'd like to meet.</p>
-    <div class="btns">
-      <a class="btn btn-navy" href="tel:+17164905006">Call 716.490.5006</a>
-      <a class="btn btn-navy" href="sms:+17164905006">Text 716.490.5006</a>
-      <a class="btn btn-navy" href="mailto:Thomas.chapmanre@gmail.com">Email me</a>
+    <h2>Book an appointment</h2>
+    <p>Calling or texting is fastest. You can also email <a href="mailto:Thomas.chapmanre@gmail.com">Thomas.chapmanre@gmail.com</a> or send the form below.</p>
+    <div class="actions">
+      <a class="btn btn-primary" href="tel:+17164905006">Call 716.490.5006</a>
+      <a class="btn btn-secondary" href="sms:+17164905006">Text 716.490.5006</a>
     </div>
 
-    <h3>Or send a request</h3>
-    <!-- Netlify Forms: submissions show in the Netlify dashboard and are emailed to you. Does not work on GitHub Pages. -->
+    <!-- Netlify Forms: submissions are emailed to you. Does not work on GitHub Pages. -->
     <form name="booking" method="POST" data-netlify="true" netlify-honeypot="company" action="/thanks.html">
       <input type="hidden" name="form-name" value="booking">
-      <p class="hidden"><label>Leave blank <input name="company"></label></p>
+      <p class="hp"><label>Leave blank <input name="company"></label></p>
       <div><label for="name">Name</label><input id="name" name="name" required autocomplete="name"></div>
       <div><label for="phone">Phone</label><input id="phone" name="phone" type="tel" required autocomplete="tel"></div>
-      <div><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email"></div>
+      <div><label for="email">Email (optional)</label><input id="email" name="email" type="email" autocomplete="email"></div>
       <div><label for="service">Service</label>
         <select id="service" name="service">
           <option>In-person notarization</option>
-          <option>Mobile notary (I travel to you)</option>
+          <option>Mobile notary</option>
           <option>Apostille guidance</option>
-          <option>Witness service</option>
+          <option>Witness services</option>
         </select>
       </div>
-      <div><label for="when">Preferred date &amp; time</label><input id="when" name="when"></div>
-      <div><label for="details">Details (document type, number of signers, location)</label><textarea id="details" name="details" rows="4"></textarea></div>
-      <button class="btn btn-gold" type="submit">Send request</button>
+      <div><label for="when">Preferred day and time</label><input id="when" name="when"></div>
+      <div><label for="details">Document type, number of signers, and location</label><textarea id="details" name="details" rows="4"></textarea></div>
+      <div><button class="btn btn-primary" type="submit">Send request</button></div>
     </form>
   </div>
 </section>
@@ -226,8 +261,8 @@
 
 <footer>
   <div class="wrap">
-    <p><strong>Chapman Notary Services</strong> · Thomas Chapman, Notary Public, State of New York · Commission #01CH0055866 · Qualified in Cattaraugus County · Commission expires October 19, 2026</p>
-    <p><a href="tel:+17164905006">716.490.5006</a> · <a href="mailto:Thomas.chapmanre@gmail.com">Thomas.chapmanre@gmail.com</a></p>
+    <p>Chapman Notary Services, Thomas Chapman, Notary Public, State of New York. Commission 01CH0055866, qualified in Cattaraugus County, expires October 19, 2026.</p>
+    <p><a href="tel:+17164905006">716.490.5006</a> or <a href="mailto:Thomas.chapmanre@gmail.com">Thomas.chapmanre@gmail.com</a></p>
     <p>I am not an attorney licensed to practice law in the State of New York and may not give legal advice about immigration or any other legal matter or accept fees for legal advice.</p>
   </div>
 </footer>
