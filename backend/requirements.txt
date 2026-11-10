@@ -4,6 +4,7 @@ python-multipart==0.0.33
 pydantic==2.14.3
 yt-dlp==2026.10.26
 faster-whisper==1.2.1
+av==15.1.0  # av 16+ removed an argument faster-whisper 1.2.1 passes
 anthropic==2.7.0
 opencv-python-headless==4.12.0.88  # 5.x no longer bundles the face cascade
 numpy==2.2.6
