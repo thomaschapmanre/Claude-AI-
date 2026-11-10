@@ -1,0 +1,11 @@
+fastapi==0.162.3
+uvicorn[standard]==0.54.0
+python-multipart==0.0.33
+pydantic==2.14.3
+yt-dlp==2026.10.26
+faster-whisper==1.2.1
+anthropic==2.7.0
+opencv-python-headless==4.12.0.88  # 5.x no longer bundles the face cascade
+numpy==2.2.6
+pytest==9.2.0
+httpx==0.28.1
