@@ -1,0 +1,546 @@
+<title>Chat Spike Clip Finder</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* Layout: a control rail on the left (file, link, tuning), the VOD activity strip and ranked moments on the right; one column on phones. */
+:root {
+  --bg: #f3f5f4;
+  --surface: #ffffff;
+  --line: #d5dcda;
+  --fg: #16201e;
+  --muted: #5b6b68;
+  --accent: #c2410c;
+  --accent-fg: #ffffff;
+  --bar: #9fb1ad;
+  --good: #0f766e;
+  --font-display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #101615; --surface: #18201f; --line: #2c3836; --fg: #e7eeec; --muted: #94a5a1;
+    --accent: #fb923c; --accent-fg: #1a0f05; --bar: #4d5f5b; --good: #5eead4;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #101615; --surface: #18201f; --line: #2c3836; --fg: #e7eeec; --muted: #94a5a1;
+  --accent: #fb923c; --accent-fg: #1a0f05; --bar: #4d5f5b; --good: #5eead4;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 15px; line-height: 1.5;
+  padding-block: 24px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+header h1 { font-family: var(--font-display); font-size: 1.7rem; line-height: 1.15; margin: 0; text-wrap: balance; }
+header p { margin: 6px 0 0; color: var(--muted); max-width: 65ch; }
+.cols { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 820px) { .cols { grid-template-columns: minmax(0, 1fr); } }
+.rail, .main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+h2 { font-family: var(--font-display); font-size: 1rem; margin: 0; }
+label { display: flex; flex-direction: column; gap: 4px; font-size: 0.8rem; font-weight: 500; color: var(--muted); }
+input[type="text"], input[type="number"], select, textarea {
+  font: inherit; font-size: 0.9rem; color: var(--fg); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 6px; padding: 7px 9px; width: 100%; min-width: 0;
+}
+textarea { font-family: var(--font-mono); font-size: 0.8rem; resize: vertical; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.drop {
+  border: 2px dashed var(--line); border-radius: 8px; padding: 18px 12px; text-align: center;
+  cursor: pointer; color: var(--muted); font-size: 0.9rem;
+}
+.drop strong { display: block; color: var(--fg); font-size: 0.95rem; }
+.drop.over { border-color: var(--accent); color: var(--fg); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.note { font-size: 0.8rem; color: var(--muted); margin: 0; }
+.status { font-size: 0.85rem; margin: 0; overflow-wrap: anywhere; }
+.status.error { color: var(--accent); font-weight: 600; }
+.status.ok { color: var(--good); }
+button {
+  font: inherit; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+  border: 1px solid var(--line); background: var(--surface); color: var(--fg);
+  border-radius: 6px; padding: 7px 12px;
+}
+button:hover { border-color: var(--muted); }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.bar-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.summary { margin: 0; color: var(--muted); font-size: 0.85rem; }
+.example { background: var(--accent); color: var(--accent-fg); font-size: 0.72rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 2px 8px; border-radius: 99px; }
+canvas { width: 100%; height: 130px; display: block; cursor: pointer; }
+.axis { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.72rem; color: var(--muted); }
+ol.moments { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.moment { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 6px 14px; align-items: start; }
+.moment.flash { border-color: var(--accent); }
+.rank { font-family: var(--font-mono); font-weight: 700; color: var(--muted); font-size: 0.85rem; padding-top: 5px; }
+.when { font-family: var(--font-mono); font-weight: 700; font-size: 1.25rem; font-variant-numeric: tabular-nums; line-height: 1.3; }
+.when small { font-family: var(--font-body); font-weight: 500; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; display: block; }
+.stats { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 0.82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.stats b { color: var(--fg); font-weight: 600; }
+.chat { margin: 6px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
+.chat li { background: var(--bg); border-radius: 4px; padding: 2px 8px; font-size: 0.82rem; overflow-wrap: anywhere; }
+.chat li span { color: var(--muted); }
+.actions { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
+.actions a { font-size: 0.85rem; font-weight: 600; text-align: center; text-decoration: none; background: var(--accent); color: var(--accent-fg); border-radius: 6px; padding: 7px 12px; }
+@media (max-width: 560px) {
+  .moment { grid-template-columns: auto minmax(0, 1fr); }
+  .actions { grid-column: 1 / -1; flex-direction: row; }
+  .actions > * { flex: 1; }
+}
+.empty { color: var(--muted); margin: 0; }
+#copyFallback { height: 160px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Chat Spike Clip Finder</h1>
+    <p>Drop in a VOD's chat log and get the moments where chat blew up, each with a clip start time 20 seconds early so you catch the setup. Everything runs in this page; your file is not uploaded anywhere.</p>
+  </header>
+
+  <div class="cols">
+    <div class="rail">
+      <section class="panel">
+        <h2>1. Chat file</h2>
+        <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose a chat JSON file">
+          <strong>Drop chat JSON here</strong>
+          or click to choose a file
+        </div>
+        <input type="file" id="file" accept=".json,application/json" hidden>
+        <p class="status" id="status" role="status"></p>
+        <p class="note">Get the file from TwitchDownloader: Chat Download, format JSON.</p>
+      </section>
+
+      <section class="panel">
+        <h2>2. VOD link (optional)</h2>
+        <label for="vod">Twitch VOD link or ID
+          <input type="text" id="vod" placeholder="https://www.twitch.tv/videos/123456789" autocomplete="off">
+        </label>
+        <p class="note" id="vodNote">Adds a button to each moment that opens the VOD at the clip start. A link on its own can't load chat, because Twitch doesn't offer VOD chat to other sites.</p>
+      </section>
+
+      <section class="panel">
+        <h2>3. Tuning</h2>
+        <div class="grid2">
+          <label for="threshold">Spike = x normal
+            <input type="number" id="threshold" value="3" min="1.1" step="0.1">
+          </label>
+          <label for="top">Moments to list
+            <input type="number" id="top" value="20" min="1" max="200" step="1">
+          </label>
+          <label for="preroll">Start early (sec)
+            <input type="number" id="preroll" value="20" min="0" step="5">
+          </label>
+          <label for="win">Window (sec)
+            <input type="number" id="win" value="10" min="2" step="1">
+          </label>
+          <label for="rolling">Normal = last (min)
+            <input type="number" id="rolling" value="5" min="1" step="1">
+          </label>
+          <label for="order">Order
+            <select id="order">
+              <option value="strength">Strongest first</option>
+              <option value="time">VOD order</option>
+            </select>
+          </label>
+        </div>
+        <label for="hype">Hype words and their bonus
+          <textarea id="hype" rows="8" spellcheck="false">kekw = 1
+lul = 1
+omegalul = 1.5
+w = 0.5
+pog* = 1
+clip it = 2
+no way = 1</textarea>
+        </label>
+        <p class="note">One per line. A bonus of 1 makes that message count double. End a word with * to match anything that starts with it (pog* catches PogChamp and POGGERS). Upper and lower case don't matter.</p>
+      </section>
+    </div>
+
+    <div class="main">
+      <section class="panel">
+        <div class="bar-head">
+          <h2>Chat activity across the VOD</h2>
+          <span class="example" id="exampleTag">Example data</span>
+        </div>
+        <canvas id="chart" aria-label="Messages per window across the VOD, with detected moments marked"></canvas>
+        <div class="axis"><span>00:00:00</span><span id="axisEnd"></span></div>
+        <p class="summary" id="summary"></p>
+      </section>
+
+      <div class="bar-head">
+        <h2 id="listTitle">Moments</h2>
+        <button type="button" class="primary" id="copyAll">Copy list</button>
+      </div>
+      <textarea id="copyFallback" readonly hidden aria-label="List text to copy"></textarea>
+      <ol class="moments" id="moments"></ol>
+      <p class="empty" id="empty" hidden></p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var $ = function (id) { return document.getElementById(id); };
+  var data = null;      // { offsets:[], texts:[], name:"", example:bool }
+  var result = null;    // { counts:[], moments:[], window:n, duration:n }
+
+  function hhmmss(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    var p = function (n) { return (n < 10 ? "0" : "") + n; };
+    return p(Math.floor(sec / 3600)) + ":" + p(Math.floor(sec % 3600 / 60)) + ":" + p(sec % 60);
+  }
+  function num(id, fallback, min) {
+    var v = parseFloat($(id).value);
+    return isFinite(v) && v >= min ? v : fallback;
+  }
+
+  // ---------- hype words ----------
+  function parseHype(text) {
+    var cfg = { words: {}, prefixes: [], phrases: [] };
+    text.split("\n").forEach(function (line) {
+      var parts = line.split("=");
+      var term = parts[0].trim().toLowerCase().replace(/\s+/g, " ");
+      if (!term) return;
+      var bonus = parts.length > 1 ? parseFloat(parts[1]) : 1;
+      if (!isFinite(bonus) || bonus <= 0) return;
+      if (term.slice(-1) === "*") cfg.prefixes.push([term.slice(0, -1), bonus]);
+      else if (term.indexOf(" ") >= 0) cfg.phrases.push([term, bonus]);
+      else cfg.words[term] = bonus;
+    });
+    return cfg;
+  }
+  function hypeBonus(text, cfg) {
+    var lower = text.toLowerCase(), best = 0, i, j;
+    var words = lower.match(/[a-z0-9']+/g) || [];
+    for (i = 0; i < words.length; i++) {
+      var w = words[i];
+      if (cfg.words.hasOwnProperty(w) && cfg.words[w] > best) best = cfg.words[w];
+      for (j = 0; j < cfg.prefixes.length; j++) {
+        if (cfg.prefixes[j][0] && w.indexOf(cfg.prefixes[j][0]) === 0 && cfg.prefixes[j][1] > best) best = cfg.prefixes[j][1];
+      }
+    }
+    if (cfg.phrases.length) {
+      var norm = lower.split(/\s+/).join(" ");
+      for (j = 0; j < cfg.phrases.length; j++) {
+        if (cfg.phrases[j][1] > best && norm.indexOf(cfg.phrases[j][0]) >= 0) best = cfg.phrases[j][1];
+      }
+    }
+    return best;
+  }
+
+  // ---------- reading the file ----------
+  function parseChat(json) {
+    var comments = Array.isArray(json) ? json : (json && json.comments);
+    if (!Array.isArray(comments)) throw new Error("This doesn't look like a TwitchDownloader chat file (no \"comments\" list in it).");
+    var rows = [];
+    for (var i = 0; i < comments.length; i++) {
+      var c = comments[i];
+      if (!c || typeof c.content_offset_seconds !== "number") continue;
+      var body = c.message && typeof c.message.body === "string" ? c.message.body.trim() : "";
+      rows.push([c.content_offset_seconds, body]);
+    }
+    if (!rows.length) throw new Error("The file has no chat messages in it.");
+    rows.sort(function (a, b) { return a[0] - b[0]; });
+    var vodId = json && json.video && json.video.id ? String(json.video.id).replace(/^v/, "") : "";
+    return {
+      offsets: rows.map(function (r) { return r[0]; }),
+      texts: rows.map(function (r) { return r[1]; }),
+      vodId: /^\d+$/.test(vodId) ? vodId : ""
+    };
+  }
+
+  function setStatus(msg, kind) {
+    var el = $("status");
+    el.textContent = msg;
+    el.className = "status" + (kind ? " " + kind : "");
+  }
+
+  function loadFile(file) {
+    if (!file) return;
+    setStatus("Reading " + file.name + "…");
+    var reader = new FileReader();
+    reader.onerror = function () { setStatus("Couldn't read that file. Try choosing it again.", "error"); };
+    reader.onload = function () {
+      try {
+        var text = String(reader.result).replace(/^﻿/, "");
+        var parsed = parseChat(JSON.parse(text));
+        data = { offsets: parsed.offsets, texts: parsed.texts, name: file.name, example: false };
+        if (parsed.vodId && !$("vod").value.trim()) $("vod").value = "https://www.twitch.tv/videos/" + parsed.vodId;
+        setStatus("Loaded " + file.name + " (" + data.offsets.length.toLocaleString() + " messages).", "ok");
+        run();
+      } catch (e) {
+        var msg = e instanceof SyntaxError ? "That file isn't valid JSON. Pick the chat .json file TwitchDownloader saved." : e.message;
+        setStatus(msg, "error");
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  // ---------- spike detection ----------
+  function detect() {
+    var W = num("win", 10, 2), threshold = num("threshold", 3, 1.01), topN = Math.round(num("top", 20, 1));
+    var preRoll = num("preroll", 20, 0), rolling = num("rolling", 5, 1) * 60;
+    var cfg = parseHype($("hype").value);
+    var offs = data.offsets, texts = data.texts;
+    var n = Math.floor(offs[offs.length - 1] / W) + 1;
+    var counts = new Array(n).fill(0), scores = new Array(n).fill(0), first = new Array(n).fill(-1);
+    var i, w;
+    for (i = 0; i < offs.length; i++) {
+      w = Math.max(0, Math.floor(offs[i] / W));
+      if (first[w] < 0) first[w] = i;
+      counts[w]++;
+      scores[w] += 1 + hypeBonus(texts[i], cfg);
+    }
+    var prefix = [0];
+    for (i = 0; i < n; i++) prefix.push(prefix[i] + scores[i]);
+    var mean = prefix[n] / n, floor = Math.max(1, mean * 0.5);
+    var lookback = Math.max(1, Math.floor(rolling / W));
+    var minMsgs = 5, ratios = new Array(n), spikes = [];
+    for (i = 0; i < n; i++) {
+      var lo = Math.max(0, i - lookback);
+      var base = i - lo >= 3 ? (prefix[i] - prefix[lo]) / (i - lo) : mean;
+      ratios[i] = scores[i] / Math.max(base, floor);
+      if (ratios[i] >= threshold && counts[i] >= minMsgs) spikes.push(i);
+    }
+    var maxGap = Math.floor(20 / W) + 1, groups = [];
+    spikes.forEach(function (s) {
+      var g = groups[groups.length - 1];
+      if (g && s - g[g.length - 1] <= maxGap) g.push(s); else groups.push([s]);
+    });
+    var moments = groups.map(function (g) {
+      var peak = g[0], ratio = 0;
+      g.forEach(function (k) { if (scores[k] > scores[peak]) peak = k; if (ratios[k] > ratio) ratio = ratios[k]; });
+      var spike = g[0] * W;
+      return {
+        spike: spike, clipStart: Math.max(0, spike - preRoll), perSec: counts[peak] / W, ratio: ratio,
+        length: (g[g.length - 1] - g[0] + 1) * W,
+        samples: samples(texts, first[peak], counts[peak])
+      };
+    });
+    var found = moments.length;
+    moments.sort(function (a, b) { return b.ratio - a.ratio; });
+    moments = moments.slice(0, topN);
+    moments.forEach(function (m, k) { m.rank = k + 1; });
+    if ($("order").value === "time") moments.sort(function (a, b) { return a.spike - b.spike; });
+    return { counts: counts, moments: moments, found: found, window: W, duration: n * W, threshold: threshold, topN: topN };
+  }
+
+  function samples(texts, start, count) {
+    var tally = {}, order = [];
+    for (var i = start; i < start + count; i++) {
+      var t = texts[i];
+      if (!t) continue;
+      if (!tally.hasOwnProperty(t)) { tally[t] = 0; order.push(t); }
+      tally[t]++;
+    }
+    order.sort(function (a, b) { return tally[b] - tally[a]; });
+    return order.slice(0, 5).map(function (t) {
+      return { text: t.length > 80 ? t.slice(0, 77) + "..." : t, times: tally[t] };
+    });
+  }
+
+  // ---------- VOD link ----------
+  function vodId() {
+    var v = $("vod").value.trim();
+    if (!v) return "";
+    var m = v.match(/videos\/(\d+)/) || v.match(/^v?(\d+)$/);
+    return m ? m[1] : null;
+  }
+  function vodUrl(id, sec) {
+    sec = Math.floor(sec);
+    return "https://www.twitch.tv/videos/" + id + "?t=" + Math.floor(sec / 3600) + "h" + Math.floor(sec % 3600 / 60) + "m" + (sec % 60) + "s";
+  }
+
+  // ---------- rendering ----------
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function render() {
+    var id = vodId();
+    $("vodNote").textContent = id === null
+      ? "That doesn't look like a VOD link. It should look like twitch.tv/videos/123456789."
+      : "Adds a button to each moment that opens the VOD at the clip start. A link on its own can't load chat, because Twitch doesn't offer VOD chat to other sites.";
+    $("exampleTag").hidden = !data.example;
+    $("axisEnd").textContent = hhmmss(result.duration);
+    $("summary").textContent = data.offsets.length.toLocaleString() + " messages over " + hhmmss(result.duration) +
+      (data.example ? ". This is made-up sample chat; drop your own file to replace it." : " from " + data.name + ".");
+
+    var list = $("moments");
+    list.textContent = "";
+    result.moments.forEach(function (m) {
+      var li = el("li", "moment");
+      li.id = "m" + m.rank;
+      li.appendChild(el("div", "rank", "#" + m.rank));
+      var mid = el("div");
+      var when = el("div", "when");
+      when.appendChild(el("small", null, "Start clip at"));
+      when.appendChild(document.createTextNode(hhmmss(m.clipStart)));
+      mid.appendChild(when);
+      var stats = el("div", "stats");
+      [["Spike at ", hhmmss(m.spike)], ["", m.perSec.toFixed(1) + " msgs/sec"], ["", m.ratio.toFixed(1) + "x normal"], ["Lasts about ", m.length + "s"]]
+        .forEach(function (s) { var sp = el("span", null, s[0]); sp.appendChild(el("b", null, s[1])); stats.appendChild(sp); });
+      mid.appendChild(stats);
+      var chat = el("ul", "chat");
+      m.samples.forEach(function (s) {
+        var c = el("li", null, s.text);
+        if (s.times > 1) c.appendChild(el("span", null, " x" + s.times));
+        chat.appendChild(c);
+      });
+      mid.appendChild(chat);
+      li.appendChild(mid);
+      var actions = el("div", "actions");
+      if (id) {
+        var a = el("a", null, "Open in VOD");
+        a.href = vodUrl(id, m.clipStart); a.target = "_blank"; a.rel = "noopener";
+        actions.appendChild(a);
+      }
+      var b = el("button", null, "Copy time");
+      b.type = "button";
+      b.addEventListener("click", function () { copy(hhmmss(m.clipStart), b, "Copy time"); });
+      actions.appendChild(b);
+      li.appendChild(actions);
+      list.appendChild(li);
+    });
+
+    $("listTitle").textContent = result.moments.length
+      ? "Top " + result.moments.length + " moments" : "Moments";
+    var empty = $("empty");
+    if (!result.moments.length) {
+      empty.hidden = false;
+      empty.textContent = "No spikes reached " + result.threshold + "x normal. Lower \"Spike = x normal\" to see more.";
+    } else if (result.moments.length < result.topN) {
+      empty.hidden = false;
+      empty.textContent = "Only " + result.found + " moments reached " + result.threshold + "x normal. Lower \"Spike = x normal\" to see more.";
+    } else empty.hidden = true;
+    $("copyAll").hidden = !result.moments.length;
+    $("copyFallback").hidden = true;
+    drawChart();
+  }
+
+  function drawChart() {
+    if (!result) return;
+    var canvas = $("chart"), css = getComputedStyle(document.documentElement);
+    var dpr = window.devicePixelRatio || 1, wCss = canvas.clientWidth, hCss = canvas.clientHeight;
+    if (!wCss) return;
+    canvas.width = Math.round(wCss * dpr); canvas.height = Math.round(hCss * dpr);
+    var ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
+    ctx.clearRect(0, 0, wCss, hCss);
+    var counts = result.counts, n = counts.length, cols = Math.max(1, Math.floor(wCss)), col = new Array(cols).fill(0), max = 1, i;
+    for (i = 0; i < n; i++) {
+      var x = Math.min(cols - 1, Math.floor(i / n * cols));
+      if (counts[i] > col[x]) col[x] = counts[i];
+      if (counts[i] > max) max = counts[i];
+    }
+    var top = 14, base = hCss - 1;
+    ctx.fillStyle = css.getPropertyValue("--bar").trim();
+    for (i = 0; i < cols; i++) {
+      var h = col[i] / max * (base - top);
+      if (h > 0) ctx.fillRect(i, base - h, 1, h);
+    }
+    ctx.fillStyle = css.getPropertyValue("--line").trim();
+    ctx.fillRect(0, base, wCss, 1);
+    var accent = css.getPropertyValue("--accent").trim();
+    ctx.fillStyle = accent;
+    ctx.font = "700 10px " + css.getPropertyValue("--font-mono");
+    ctx.textAlign = "center";
+    result.moments.forEach(function (m) {
+      var mx = Math.min(wCss - 1, Math.max(1, m.spike / result.duration * wCss));
+      ctx.fillRect(Math.round(mx) - 1, top, 2, base - top);
+      if (m.rank <= 9) ctx.fillText(String(m.rank), Math.min(wCss - 6, Math.max(6, mx)), 10);
+    });
+  }
+
+  function run() {
+    if (!data) return;
+    result = detect();
+    render();
+  }
+
+  // ---------- copying ----------
+  function copy(text, button, label) {
+    var done = function () { button.textContent = "Copied"; setTimeout(function () { button.textContent = label; }, 1500); };
+    var fail = function () {
+      var box = $("copyFallback");
+      box.hidden = false; box.value = text; box.focus(); box.select();
+    };
+    try { navigator.clipboard.writeText(text).then(done, fail); } catch (e) { fail(); }
+  }
+  function listText() {
+    var id = vodId();
+    return result.moments.map(function (m) {
+      var line = "#" + m.rank + "  start " + hhmmss(m.clipStart) + "  (spike " + hhmmss(m.spike) + ", " +
+        m.perSec.toFixed(1) + " msgs/sec, " + m.ratio.toFixed(1) + "x normal)";
+      if (id) line += "\n    " + vodUrl(id, m.clipStart);
+      if (m.samples.length) line += "\n    chat: " + m.samples.map(function (s) { return s.text + (s.times > 1 ? " x" + s.times : ""); }).join(" | ");
+      return line;
+    }).join("\n\n");
+  }
+
+  // ---------- example data ----------
+  function exampleData() {
+    var seed = 7, rnd = function () { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; };
+    var pick = function (a) { return a[Math.floor(rnd() * a.length)]; };
+    var rows = [], idle = ["hello", "gg", "nice", "what game is this", "lol", "first time here", "that skin is clean", "o7"], t, k;
+    for (t = 0; t < 9000; t++) if (rnd() < 0.45) rows.push([t + rnd(), pick(idle)]);
+    [[1210, 90, ["KEKW", "OMEGALUL", "LUL", "he fell LMAO"]],
+     [2840, 70, ["CLIP IT", "no way", "NO WAY", "CLIP IT CLIP IT"]],
+     [4425, 55, ["W", "PogChamp", "POGGERS", "W W W"]],
+     [6130, 60, ["OMEGALUL", "KEKW", "chat is he ok"]],
+     [7700, 45, ["no way he hit that", "Pog", "CLIP IT"]],
+     [8350, 40, ["wait what", "???", "did that just happen"]]]
+      .forEach(function (b) { for (k = 0; k < b[1]; k++) rows.push([b[0] + rnd() * 13, pick(b[2])]); });
+    rows.sort(function (a, b) { return a[0] - b[0]; });
+    return { offsets: rows.map(function (r) { return r[0]; }), texts: rows.map(function (r) { return r[1]; }), name: "example", example: true };
+  }
+
+  // ---------- wiring ----------
+  var drop = $("drop"), fileInput = $("file");
+  drop.addEventListener("click", function () { fileInput.click(); });
+  drop.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileInput.click(); } });
+  fileInput.addEventListener("change", function () { loadFile(fileInput.files[0]); fileInput.value = ""; });
+  ["dragenter", "dragover"].forEach(function (ev) {
+    document.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add("over"); });
+  });
+  ["dragleave", "drop"].forEach(function (ev) {
+    document.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove("over"); });
+  });
+  document.addEventListener("drop", function (e) {
+    if (e.dataTransfer && e.dataTransfer.files.length) loadFile(e.dataTransfer.files[0]);
+  });
+  ["threshold", "top", "preroll", "win", "rolling", "order", "hype"].forEach(function (id) {
+    $(id).addEventListener("input", run);
+  });
+  $("vod").addEventListener("input", function () { if (result) render(); });
+  $("copyAll").addEventListener("click", function () { copy(listText(), $("copyAll"), "Copy list"); });
+  $("chart").addEventListener("click", function (e) {
+    if (!result || !result.moments.length) return;
+    var rect = e.target.getBoundingClientRect(), t = (e.clientX - rect.left) / rect.width * result.duration, best = result.moments[0];
+    result.moments.forEach(function (m) { if (Math.abs(m.spike - t) < Math.abs(best.spike - t)) best = m; });
+    var card = $("m" + best.rank);
+    card.scrollIntoView({ behavior: "smooth", block: "center" });
+    card.classList.add("flash");
+    setTimeout(function () { card.classList.remove("flash"); }, 1500);
+  });
+  window.addEventListener("resize", drawChart);
+  try {
+    window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", drawChart);
+    new MutationObserver(drawChart).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  } catch (e) {}
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawChart);
+
+  data = exampleData();
+  run();
+})();
+</script>
