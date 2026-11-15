@@ -16,7 +16,9 @@ Standard library only. Needs Python 3.8 or newer.
 
 import json
 import os
+import platform
 import re
+import shutil
 import subprocess
 import sys
 import urllib.request
@@ -43,6 +45,7 @@ HYPE_PHRASES = {"clip it": 2.0, "no way": 1.0}
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 TOOLS = os.path.join(HERE, "clip_tools")
+OUTPUT_ROOT = HERE   # clip folders are created inside this folder
 IS_WINDOWS = os.name == "nt"
 CLI_NAME = "TwitchDownloaderCLI.exe" if IS_WINDOWS else "TwitchDownloaderCLI"
 FFMPEG_NAME = "ffmpeg.exe" if IS_WINDOWS else "ffmpeg"
@@ -106,19 +109,24 @@ def get_tools():
     ffmpeg = os.path.join(TOOLS, FFMPEG_NAME)
 
     if not os.path.exists(cli):
-        if not IS_WINDOWS:
+        if IS_WINDOWS:
+            build = "windows-x64"
+        elif sys.platform.startswith("linux"):
+            arm = platform.machine().lower() in ("aarch64", "arm64")
+            build = "linux-arm64" if arm else "linux-x64"
+        else:
             raise Problem(
-                "Automatic setup only works on Windows. Download TwitchDownloaderCLI from\n"
-                "%s and put it in:\n%s" % (RELEASES_PAGE, TOOLS)
+                "Automatic setup only works on Windows and Linux. Download TwitchDownloaderCLI\n"
+                "from %s and put it in:\n%s" % (RELEASES_PAGE, TOOLS)
             )
         say("First run: downloading TwitchDownloaderCLI (one time only)...")
         manual = (
             "Couldn't download TwitchDownloaderCLI automatically.\n"
             "Do it by hand instead:\n"
             "  1. Open %s\n"
-            "  2. Download the file with CLI and Windows-x64 in its name\n"
-            "  3. Open the zip and copy TwitchDownloaderCLI.exe into:\n     %s\n"
-            "  4. Run this again." % (RELEASES_PAGE, TOOLS)
+            "  2. Download the file with CLI and %s in its name\n"
+            "  3. Open the zip and copy %s into:\n     %s\n"
+            "  4. Run this again." % (RELEASES_PAGE, build, CLI_NAME, TOOLS)
         )
         try:
             request = urllib.request.Request(RELEASES_API, headers={"User-Agent": "clip-maker"})
@@ -126,7 +134,7 @@ def get_tools():
                 release = json.load(response)
             wanted = [
                 a["browser_download_url"] for a in release.get("assets", [])
-                if "cli" in a["name"].lower() and "windows-x64" in a["name"].lower()
+                if "cli" in a["name"].lower() and build in a["name"].lower()
                 and a["name"].lower().endswith(".zip")
             ]
             if not wanted:
@@ -136,6 +144,8 @@ def get_tools():
             with zipfile.ZipFile(zip_path) as z:
                 z.extractall(TOOLS)
             os.remove(zip_path)
+            if not IS_WINDOWS and os.path.exists(cli):
+                os.chmod(cli, 0o755)
         except Problem:
             raise
         except Exception as error:
@@ -143,6 +153,8 @@ def get_tools():
         if not os.path.exists(cli):
             raise Problem(manual)
 
+    if not os.path.exists(ffmpeg) and shutil.which("ffmpeg"):
+        ffmpeg = shutil.which("ffmpeg")   # already installed on this machine
     if not os.path.exists(ffmpeg):
         say("First run: downloading FFmpeg (one time only)...")
         subprocess.run([cli, "ffmpeg", "--download"], cwd=TOOLS)
@@ -327,7 +339,7 @@ def main():
     vod = ask_for_vod()
     cli, ffmpeg = get_tools()
 
-    folder = os.path.join(HERE, "clips_" + vod)
+    folder = os.path.join(OUTPUT_ROOT, "clips_" + vod)
     os.makedirs(folder, exist_ok=True)
     chat_path = os.path.join(folder, "chat.json")
 
